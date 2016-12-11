@@ -16,6 +16,7 @@ namespace vyatta_config_updater
 	{
 		const string RegistryKey = @"SOFTWARE\VyattaConfigUpdater";
 		string Fingerprint = "";
+		bool ProgrammaticClosing = false;
 
 		public Login()
 		{
@@ -31,6 +32,17 @@ namespace vyatta_config_updater
 			{
 				ActiveControl = Password;
 			}
+		}
+
+		protected override void OnFormClosing(FormClosingEventArgs e)
+		{
+			base.OnFormClosing(e);
+			
+			if( !ProgrammaticClosing )
+			{
+				Application.Exit();
+			}
+			ProgrammaticClosing = false;
 		}
 
 		private void Cancel_Click( object sender, EventArgs e )
@@ -50,6 +62,8 @@ namespace vyatta_config_updater
 
 			using( Session session = new Session() )
 			{
+				session.ExecutablePath = "WinSCP\\WinSCP.exe";
+
 				if( Fingerprint == null || Fingerprint.Length == 0 )
 				{
 					Fingerprint = session.ScanFingerprint( options );
@@ -99,6 +113,12 @@ namespace vyatta_config_updater
 					MessageBox.Show( exception.Message, "Error connecting", MessageBoxButtons.OK, MessageBoxIcon.Error );
 					return;
 				}
+
+				var MainForm = new Main( Address.Text, Username.Text, Password.Text, tempConfigPath );
+				Visible = false;
+				MainForm.Show();
+				ProgrammaticClosing = true;
+				Close();
 			}
 		}
 	}
