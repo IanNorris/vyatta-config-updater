@@ -16,7 +16,7 @@ namespace vyatta_config_updater.VyattaConfig
 			this.Name = Name;
 		}
 
-		public void Add( string Value, bool Quoted )
+		public void Add( string Value, bool? Quoted = null )
 		{
 			Children.Add( new VyattaConfigValue( Value, Quoted ) );
 		}
@@ -32,6 +32,59 @@ namespace vyatta_config_updater.VyattaConfig
 				Output.Append( " " );
 
 				Child.ToString( Output, 0 );
+			}
+		}
+
+		public override string ToString()
+		{
+			StringBuilder SB = new StringBuilder();
+			ToString( SB, 0 );
+			return SB.ToString();
+		}
+
+		public string GetAttributeString()
+		{
+			return ToString();
+		}
+
+		public VyattaConfigNode GetChild( string Child )
+		{
+			if( Child == Name )
+			{
+				return this;
+			}
+
+			return null;
+		}
+
+		public VyattaConfigAttribute AddAttribute( string Parent )
+		{
+			return null;
+		}
+
+		public VyattaConfigObject AddObject( string Parent )
+		{
+			return null;
+		}
+
+		public void Delete( string Path )
+		{
+		}
+
+		public string GetName()
+		{
+			return Name;
+		}
+
+		public VyattaConfigValue GetValue( int Index = 0 )
+		{
+			if( Index < Children.Count )
+			{
+				return Children[ Index ];
+			}
+			else
+			{
+				return null;
 			}
 		}
 	}

@@ -44,5 +44,139 @@ namespace vyatta_config_updater.VyattaConfig
 				Output.Append( VyattaConfigUtil.IndentString( Indent ) + "}" );
 			}
 		}
+
+		public override string ToString()
+		{
+			StringBuilder SB = new StringBuilder();
+			ToString( SB, 0 );
+			return SB.ToString();
+		}
+
+		public string GetAttributeString()
+		{
+			return Attribute?.ToString();
+		}
+
+		public VyattaConfigNode GetChild( string Child )
+		{
+			if( Attribute == null )
+			{
+				foreach( var ChildNode in Children )
+				{
+					var Result = ChildNode.GetChild( Child );
+					if( Result != null )
+					{
+						return Result;
+					}
+				}
+			}
+			else
+			{
+				if( Child == Attribute.ToString() )
+				{
+					return this;
+				}
+				else
+				{
+					string[] Split = Child.Split( new char[] { ':' }, 2 );
+					if( Split.Length != 2 )
+					{
+						return null;
+					}
+				
+					if( Split[0] != Attribute.ToString() )
+					{
+						return null;
+					}
+
+					foreach( var ChildNode in Children )
+					{
+						var Result = ChildNode.GetChild( Split[1] );
+						if( Result != null )
+						{
+							return Result;
+						}
+					}
+				}
+			}
+
+			return null;
+		}
+
+		public VyattaConfigAttribute AddAttribute( string Parent )
+		{
+			string[] Split = Parent.Split( new char[] { ':' }, 2 );
+			
+			foreach( var ChildNode in Children )
+			{
+				if( ChildNode.GetAttributeString() == Split[0] )
+				{
+					return ChildNode.AddAttribute( Split[1] );
+				}
+			}
+
+			if( Split.Length == 2 )
+			{
+				var NewNode = new VyattaConfigObject( new VyattaConfigAttribute(Split[0]) );
+				Children.Add( NewNode );
+				return NewNode.AddAttribute( Split[1] );
+			}
+			else
+			{
+				var NewNode = new VyattaConfigAttribute(Split[0]);
+				Children.Add( NewNode );
+				return NewNode;
+			}
+		}
+
+		public VyattaConfigObject AddObject( string Parent )
+		{
+			string[] Split = Parent.Split( new char[] { ':' }, 2 );
+			
+			foreach( var ChildNode in Children )
+			{
+				if( ChildNode.GetAttributeString() == Split[0] )
+				{
+					return ChildNode.AddObject( Split[1] );
+				}
+			}
+
+			var NewNode = new VyattaConfigObject( new VyattaConfigAttribute(Split[0]) );
+			Children.Add( NewNode );
+
+			if( Split.Length == 2 )
+			{
+				return NewNode.AddObject( Split[1] );
+			}
+			else
+			{
+				return NewNode;
+			}
+		}
+
+		public void Delete( string Path )
+		{
+			string[] Split = Path.Split( new char[] { ':' }, 2 );
+						
+			foreach( var ChildNode in Children )
+			{
+				if( ChildNode.GetAttributeString() == Split[0] )
+				{
+					if( Split.Length == 1 )
+					{
+						Children.Remove(ChildNode);
+						return;
+					}
+
+					ChildNode.Delete( Split[1] );
+					return;
+				}
+			}
+		}
+
+		public string GetName()
+		{
+			return Attribute?.GetName();
+		}
 	}
 }
