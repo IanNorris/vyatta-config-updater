@@ -62,8 +62,6 @@ namespace vyatta_config_updater
 
 			using( Session session = new Session() )
 			{
-				session.ExecutablePath = "WinSCP\\WinSCP.exe";
-
 				if( Fingerprint == null || Fingerprint.Length == 0 )
 				{
 					Fingerprint = session.ScanFingerprint( options );
