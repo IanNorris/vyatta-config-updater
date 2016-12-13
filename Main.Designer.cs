@@ -1,4 +1,9 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Windows.Forms;
+using vyatta_config_updater.VyattaConfig;
+using vyatta_config_updater.VyattaConfig.Routing;
 
 namespace vyatta_config_updater
 {
@@ -24,7 +29,20 @@ namespace vyatta_config_updater
 
 		public Main( string Address, string Username, string Password, string ConfigPath )
 		{
+			string Errors = "";
+			VyattaConfigObject Root = VyattaConfigUtil.ReadFromFile( ConfigPath, ref Errors );
+			
+			//23.246.0.0-23.246.31.255:
+			//CIDR: 23.246.0.0/19
 
+			VyattaConfigRouting.DeleteStaticRoute( Root, "104.27.200.0/22" );
+			VyattaConfigRouting.AddStaticRoute( Root, "23.246.0.0-23.246.31.255", "192.168.72.1", "Netflix" );
+			
+			string tempOutputConfigPath = Path.ChangeExtension(Path.GetTempFileName(), Guid.NewGuid().ToString());
+
+			VyattaConfigUtil.WriteToFile( Root, tempOutputConfigPath );
+
+			Process.Start( @"C:\Program Files (x86)\WinMerge\WinMergeU.exe", string.Format( "\"{0}\" \"{1}\"", ConfigPath, tempOutputConfigPath ) );
 		}
 
 		protected override void OnFormClosing(FormClosingEventArgs e)
