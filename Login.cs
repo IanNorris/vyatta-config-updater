@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using WinSCP;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 
