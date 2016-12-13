@@ -25,6 +25,9 @@ namespace vyatta_config_updater.VyattaConfig
 		{
 			var InputBuffer = File.ReadAllText( Filename );
 
+			//Just in case we get a file with rogue line endings
+			InputBuffer = InputBuffer.Replace( "\r\n", "\n" );
+
 			Errors = "";
 
 			var Parser = new VyattaConfigParser( InputBuffer );
