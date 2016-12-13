@@ -21,6 +21,11 @@ namespace vyatta_config_updater.VyattaConfig
 			Children.Add( NewNode );
 		}
 
+		public List<VyattaConfigNode> GetChildren()
+		{
+			return Children;
+		}
+
 		public void ToString( StringBuilder Output, int Indent )
 		{
 			if( Attribute == null )

@@ -63,6 +63,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VyattaConfig\Routing\VyattaConfigRouting.cs" />
     <Compile Include="VyattaConfig\VyattaConfigUtil.cs" />
     <Compile Include="VyattaConfig\VyattaConfigAttribute.cs" />
     <Compile Include="VyattaConfig\VyattaConfigBlankLines.cs" />

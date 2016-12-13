@@ -46,5 +46,35 @@ namespace vyatta_config_updater.VyattaConfig
 				FileOut.Write( SB.ToString() );
 			}
 		}
+
+		public static UInt32 NumberOfSetBits(UInt32 i)
+		{
+			i = i - ((i >> 1) & 0x55555555);
+			i = (i & 0x33333333) + ((i >> 2) & 0x33333333);
+			return (((i + (i >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
+		}
+
+		public static string IPRangeToCIDR( string Range )
+		{
+			string[] Split = Range.Split( new char[] { '-' }, 2 );
+			if( Split.Length != 2 )
+			{
+				return null;
+			}
+
+			long MaskBits = 0;
+
+			string[] IP1Segments = Split[0].Split( new char[] { '.' }, 4 );
+			string[] IP2Segments = Split[1].Split( new char[] { '.' }, 4 );
+			for( int index = 0; index < 4; index++ )
+			{
+				int Segment = int.Parse(IP2Segments[index]) - int.Parse(IP1Segments[index]);
+				MaskBits |= (long)(Segment << (4-index));
+			}
+
+			UInt32 Mask = 32 - NumberOfSetBits((UInt32)MaskBits);
+
+			return string.Format( "{0}/{1}", Split[0], Mask );
+		}
 	}
 }
