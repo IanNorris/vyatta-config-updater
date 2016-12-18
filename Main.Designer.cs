@@ -27,51 +27,6 @@ namespace vyatta_config_updater
 			base.Dispose( disposing );
 		}
 
-		public Main( string Address, string Username, string Password, string ConfigPath, ASNData ASNData )
-		{
-			InitializeComponent();
-
-			string Errors = "";
-			VyattaConfigObject Root = VyattaConfigUtil.ReadFromFile( ConfigPath, ref Errors );
-			
-			//23.246.0.0-23.246.31.255:
-			//CIDR: 23.246.0.0/19
-
-			VyattaConfigRouting.DeleteStaticRoute( Root, "104.27.200.0/22" );
-			
-			VyattaConfigRouting.AddStaticRoutesForOrganization( Root, "Netflix", ASNData, "192.168.72.1" );
-			VyattaConfigRouting.AddStaticRoutesForOrganization( Root, "BBC", ASNData, "192.168.72.1" );
-			VyattaConfigRouting.AddStaticRoutesForOrganization( Root, "Valve", ASNData, "192.168.72.1" );
-			VyattaConfigRouting.AddStaticRoutesForOrganization( Root, "Nest", ASNData, "192.168.72.1" );
-			
-			string tempOutputConfigPath = Path.ChangeExtension(Path.GetTempFileName(), Guid.NewGuid().ToString());
-
-			VyattaConfigUtil.WriteToFile( Root, tempOutputConfigPath );
-
-			var Proc = Process.Start( @"C:\Program Files (x86)\WinMerge\WinMergeU.exe", string.Format( "\"{0}\" \"{1}\"", ConfigPath, tempOutputConfigPath ) );
-			Proc.WaitForExit();
-
-			if( MessageBox.Show( "Upload new config?", "Are you sure?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question ) == DialogResult.Yes )
-			{
-				var Busy = new Busy( new RouterWriteNewConfig( Address, Username, Password, tempOutputConfigPath ) );
-				if( Busy.ShowDialog() == DialogResult.OK )
-				{
-					MessageBox.Show( "New config has been uploaded.\nYour router will now reload the config.", "Success!", MessageBoxButtons.OK, MessageBoxIcon.Information );
-				}
-				else
-				{
-					MessageBox.Show( "Error uploading new config..", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error );
-				}
-			}
-		}
-
-		protected override void OnFormClosing(FormClosingEventArgs e)
-		{
-			base.OnFormClosing(e);
-			
-			Application.Exit();
-		}
-
 		#region Windows Form Designer generated code
 
 		/// <summary>
@@ -80,11 +35,34 @@ namespace vyatta_config_updater
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.components = new System.ComponentModel.Container();
+			this.Upload = new System.Windows.Forms.Button();
+			this.SuspendLayout();
+			// 
+			// Upload
+			// 
+			this.Upload.Location = new System.Drawing.Point(94, 80);
+			this.Upload.Name = "Upload";
+			this.Upload.Size = new System.Drawing.Size(75, 23);
+			this.Upload.TabIndex = 0;
+			this.Upload.Text = "Upload";
+			this.Upload.UseVisualStyleBackColor = true;
+			this.Upload.Click += new System.EventHandler(this.Upload_Click);
+			// 
+			// Main
+			// 
+			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.ClientSize = new System.Drawing.Size(284, 261);
+			this.Controls.Add(this.Upload);
+			this.Name = "Main";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Main";
+			this.ResumeLayout(false);
+
 		}
 
 		#endregion
+
+		private Button Upload;
 	}
 }

@@ -10,8 +10,6 @@ namespace vyatta_config_updater
 {
 	public class RouterWriteNewConfig : BusyWorkInterface
 	{
-		private string TempPath;
-
 		private string Address;
 		private string Username;
 		private string Password;

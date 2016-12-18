@@ -64,5 +64,75 @@ namespace vyatta_config_updater.VyattaConfig.Routing
 
 			ConfigRoot.Delete( string.Format( "protocols:static:route {0}", Network ) );
 		}
+
+		public static void DeleteGeneratedStaticRoutes( VyattaConfigObject ConfigRoot )
+		{
+			var StaticRoutesNodes = ConfigRoot.GetChild("protocols:static");
+			var StaticRoutes = StaticRoutesNodes as VyattaConfigObject;
+
+			var Results = new List<VyattaConfigObject>();
+			if( StaticRoutes != null )
+			{
+				var Children = StaticRoutes.GetChildren();
+				
+				List<VyattaConfigNode> ToRemove = new List<VyattaConfigNode>();
+
+				foreach( var Child in Children )
+				{
+					var CastChild = Child as VyattaConfigObject;
+					if( CastChild != null )
+					{
+						bool IsAuto = false;
+
+						var SubChildren = CastChild.GetChildren();
+
+						foreach( var SubChild in SubChildren )
+						{
+							var CastSubChild = SubChild as VyattaConfigObject;
+							if( CastSubChild != null )
+							{
+								
+								var SubSubChildren = CastSubChild.GetChildren();
+
+								foreach( var SubSubChild in SubSubChildren )
+								{
+									var CastSubSubAttribute = SubSubChild as VyattaConfigAttribute;
+									if( CastSubSubAttribute != null )
+									{
+										if( CastSubSubAttribute.GetName() == "description" )
+										{
+											string Value = CastSubSubAttribute.GetValue(0).GetValue();
+											if( Value != null )
+											{
+												if( Value.Contains( "VCU-Auto:" ) )
+												{
+													IsAuto = true;
+													break;
+												}
+											}
+										}
+									}
+								}
+
+								if( IsAuto )
+								{
+									break;
+								}
+							}
+						}
+
+						if( IsAuto )
+						{
+							ToRemove.Add( Child );
+						}
+					}
+				}
+
+				foreach( var Remove in ToRemove )
+				{
+					Children.Remove( Remove );
+				}
+			}
+		}
 	}
 }
