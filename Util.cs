@@ -11,6 +11,9 @@ namespace vyatta_config_updater
 {
 	public class Util
 	{
+		public delegate void UpdateStatusDelegate( string NewStatus, int NewProgress );
+		public delegate bool DoWorkDelegate( UpdateStatusDelegate SetStatus );
+
 		//Crypto functions based on answer by Brett
 		// http://stackoverflow.com/questions/202011/encrypt-and-decrypt-a-string#2791259
 

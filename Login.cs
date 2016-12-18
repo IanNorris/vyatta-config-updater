@@ -59,7 +59,9 @@ namespace vyatta_config_updater
 
 		private void OK_Click( object sender, EventArgs e )
 		{
-			var Busy = new Busy( Address.Text, Username.Text, Password.Text );
+			RouterLogin Login = new RouterLogin( Address.Text, Username.Text, Password.Text );
+
+			var Busy = new Busy( Login );
 			if( Busy.ShowDialog() == DialogResult.OK )
 			{
 				Microsoft.Win32.RegistryKey regSettings = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegistryKey);
@@ -76,7 +78,7 @@ namespace vyatta_config_updater
 				}
 				regSettings.Close();
 
-				var MainForm = new Main( Address.Text, Username.Text, Password.Text, Busy.GetTempPath() );
+				var MainForm = new Main( Address.Text, Username.Text, Password.Text, Login.GetTempPath() );
 				Visible = false;
 				MainForm.Show();
 				ProgrammaticClosing = true;
