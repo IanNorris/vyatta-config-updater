@@ -75,7 +75,7 @@ namespace vyatta_config_updater
 				}
 				regSettings.Close();
 
-				var MainForm = new Main( Address.Text, Username.Text, Password.Text, LoginWork.GetTempPath(), ASNData );
+				var MainForm = new Main( Address.Text, Username.Text, Password.Text, LoginWork.GetTempPath(), ASNData, LoginWork.GetInterfaces() );
 				Visible = false;
 				MainForm.Show();
 				ProgrammaticClosing = true;

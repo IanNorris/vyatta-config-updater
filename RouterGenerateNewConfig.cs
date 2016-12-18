@@ -15,12 +15,14 @@ namespace vyatta_config_updater
 		private string OldConfig;
 		private string NewConfig;
 		private ASNData ASNData;
+		private List<InterfaceMapping> Interfaces;
 
-		public RouterGenerateNewConfig( string ConfigPath, ASNData ASNData )
+		public RouterGenerateNewConfig( string ConfigPath, ASNData ASNData, List<InterfaceMapping> Interfaces )
 		{
 			this.OldConfig = ConfigPath;
 			this.NewConfig = Path.ChangeExtension(Path.GetTempFileName(), Guid.NewGuid().ToString());
 			this.ASNData = ASNData;
+			this.Interfaces = Interfaces;
 		}
 
 		public string GetNewConfigPath()
@@ -45,22 +47,22 @@ namespace vyatta_config_updater
 			if( ShouldCancel() ) { return false; }
 			
 			SetStatus( "Generating Netflix static routing...", 32 );
-			VyattaConfigRouting.AddStaticRoutesForOrganization( Root, "Netflix", ASNData, "192.168.72.1" );
+			VyattaConfigRouting.AddStaticRoutesForOrganization( Root, "Netflix", ASNData, Interfaces, "Internet" );
 
 			if( ShouldCancel() ) { return false; }
 
 			SetStatus( "Generating BBC static routing...", 48 );
-			VyattaConfigRouting.AddStaticRoutesForOrganization( Root, "BBC", ASNData, "192.168.72.1" );
+			VyattaConfigRouting.AddStaticRoutesForOrganization( Root, "BBC", ASNData, Interfaces, "Internet" );
 
 			if( ShouldCancel() ) { return false; }
 
 			SetStatus( "Generating Valve static routing...", 56 );
-			VyattaConfigRouting.AddStaticRoutesForOrganization( Root, "Valve", ASNData, "192.168.72.1" );
+			VyattaConfigRouting.AddStaticRoutesForOrganization( Root, "Valve", ASNData, Interfaces, "Internet" );
 
 			if( ShouldCancel() ) { return false; }
 
 			SetStatus( "Generating Nest static routing...", 80 );
-			VyattaConfigRouting.AddStaticRoutesForOrganization( Root, "Nest", ASNData, "192.168.72.1" );
+			VyattaConfigRouting.AddStaticRoutesForOrganization( Root, "Nest", ASNData, Interfaces, "Internet" );
 			
 			SetStatus( "Saving new config...", 90 );
 			VyattaConfigUtil.WriteToFile( Root, NewConfig );

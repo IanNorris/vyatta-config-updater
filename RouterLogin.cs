@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using Renci.SshNet;
-
+using Renci.SshNet.Common;
 
 namespace vyatta_config_updater
 {
@@ -13,6 +14,8 @@ namespace vyatta_config_updater
 		private string Address;
 		private string Username;
 		private string Password;
+
+		private List<InterfaceMapping> Interfaces;
 
 		public RouterLogin( string Address, string Username, string Password )
 		{
@@ -26,6 +29,11 @@ namespace vyatta_config_updater
 		public string GetTempPath()
 		{
 			return TempPath;
+		}
+
+		public List<InterfaceMapping> GetInterfaces()
+		{
+			return Interfaces;
 		}
 
 		private string RunCommand( SshClient Client, string CommandLine )
@@ -59,8 +67,31 @@ namespace vyatta_config_updater
 
 			Stream.WriteLine( CommandLine );
 
-			string Response = Stream.Expect( ExpectRootPrompt ? new Regex(@"[#>]") : new Regex(@"[$>]") );
+			string Response = "";
 
+			bool End = false;
+
+			while( !End )
+			{
+				Stream.Expect(
+					new ExpectAction( new Regex(@"\w+@\w+\:[\w~\/\\]+\$"), (Input) =>
+					{
+						End = true;
+						Response += Input;
+					} ),
+					new ExpectAction( new Regex(@"\w+@\w+\:[\w~\/\\]+#"), (Input) =>
+					{
+						End = true;
+						Response += Input;
+					} ),
+					new ExpectAction( new Regex(@"\n\:"), (Input) =>
+					{
+						Response += Input;
+						Stream.Write(" ");
+					} )
+				);
+			}
+			
 			System.Console.Out.WriteLine( Response );
 			
 			return Response;
@@ -88,7 +119,7 @@ namespace vyatta_config_updater
 
 				if( ShouldCancel() ) { return false; }
 
-				/*//Enter configure mode
+				//Enter configure mode
 
 				var TermOptions = new Dictionary<TerminalModes,uint>();
 				TermOptions.Add( TerminalModes.ECHO, 0 );
@@ -100,11 +131,58 @@ namespace vyatta_config_updater
 					string Initial = Shell.Expect(new Regex(@"[$>]"));
 					System.Console.Out.WriteLine( Initial );
 
-					SetStatus( "Entering configure mode...", 8 );
+					SetStatus( "Processing routing interfaces...", 8 );
+
+					string ShowRoutes = RunShellCommand( Shell, "show ip route", false );
+
+					Regex ParseGatewayRoutes = new Regex( @"\w\s+\*\>\s+([0-9.]+)\/(\d+)\s+\[\d+\/\d+\] via ([0-9.\/]+), (\w+)" );
+
+					Dictionary<string, string> Gateways = new Dictionary<string, string>();
+					
+					string[] RouteLines = ShowRoutes.Split( new char[] { '\n' } );
+					foreach( string Line in RouteLines )
+					{
+						Match Match = ParseGatewayRoutes.Match( Line );
+						if( Match.Success )
+						{
+							//Only match gateways to the internet
+							if( Match.Groups[1].Value == "0.0.0.0" && (Match.Groups[2].Value == "0" || Match.Groups[2].Value == "1") )
+							{
+								Gateways[Match.Groups[4].Value] = Match.Groups[3].Value;
+							}
+						}
+					}
+
+					SetStatus( "Processing interface list...", 16 );
 					string ShowInterfaces = RunShellCommand( Shell, "show interfaces", false );
-					string Exit = RunShellCommand( Shell, "exit", false );
-						
-				}*/
+
+					Regex ParseInterfaces = new Regex( @"(\w+)\s+([0-9.\-]+(:?\/[0-9]+)?)\s+(\w\/\w)\s+(\w+)?" );
+
+					Interfaces = new List<InterfaceMapping>();
+
+					string[] InterfaceLines = ShowInterfaces.Split( new char[] { '\n' } );
+					foreach( string Line in InterfaceLines )
+					{
+						Match Match = ParseInterfaces.Match( Line );
+						if( Match.Success )
+						{
+							InterfaceMapping Mapping = new InterfaceMapping();
+
+							Mapping.Interface = Match.Groups[1].Value;
+							Mapping.IPAddress = Match.Groups[2].Value == "-" ? "" : Match.Groups[2].Value;
+							Mapping.Codes = Match.Groups[4].Value;
+							Mapping.Description = Match.Groups[5].Value;
+
+							string Gateway;
+							if( Gateways.TryGetValue( Mapping.Interface, out Gateway ))
+							{
+								Mapping.Gateway = Gateway;
+							}
+
+							Interfaces.Add( Mapping );
+						}
+					}	
+				}
 
 				SetStatus( "Disconnecting from SSH...", 50 );
 

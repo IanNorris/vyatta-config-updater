@@ -19,21 +19,23 @@ namespace vyatta_config_updater
 		private string Password;
 		private string OldConfigPath;
 		private ASNData ASNData;
+		private List<InterfaceMapping> Interfaces;
 
-		public Main( string Address, string Username, string Password, string ConfigPath, ASNData ASNData )
+		public Main( string Address, string Username, string Password, string ConfigPath, ASNData ASNData, List<InterfaceMapping> Interfaces )
 		{
 			this.Address = Address;
 			this.Username = Username;
 			this.Password = Password;
 			this.OldConfigPath = ConfigPath;
 			this.ASNData = ASNData;
+			this.Interfaces = Interfaces;
 
 			InitializeComponent();
 		}
 
 		private void Upload_Click( object sender, EventArgs e )
 		{
-			var GenerateConfig = new RouterGenerateNewConfig( OldConfigPath, ASNData );
+			var GenerateConfig = new RouterGenerateNewConfig( OldConfigPath, ASNData, Interfaces );
 
 			Busy BusyWorker = new Busy( GenerateConfig );
 

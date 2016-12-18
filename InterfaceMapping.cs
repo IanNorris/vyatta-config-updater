@@ -8,9 +8,10 @@ namespace vyatta_config_updater
 {
 	public struct InterfaceMapping
 	{
-		string Interface;
-		string IPAddress;
-		string Codes;
-		string Description;
+		public string Interface;
+		public string IPAddress;
+		public string Codes;
+		public string Description;
+		public string Gateway;
 	}
 }

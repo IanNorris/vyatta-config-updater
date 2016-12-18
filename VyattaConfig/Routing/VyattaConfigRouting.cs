@@ -8,7 +8,7 @@ namespace vyatta_config_updater.VyattaConfig.Routing
 {
 	public static class VyattaConfigRouting
 	{
-		public static void AddStaticRoutesForOrganization( VyattaConfigObject ConfigRoot, string OrganizationSubstring, ASNData ASNData, string TargetIP )
+		public static void AddStaticRoutesForOrganization( VyattaConfigObject ConfigRoot, string OrganizationSubstring, ASNData ASNData, List<InterfaceMapping> Interfaces, string Target )
 		{
 			var Netmasks = ASNData.GetNetmasksFromOrganization( OrganizationSubstring );
 			
@@ -16,18 +16,29 @@ namespace vyatta_config_updater.VyattaConfig.Routing
 
 			foreach( var Netmask in Netmasks )
 			{
-				VyattaConfigRouting.AddStaticRoute( ConfigRoot, Netmask, TargetIP, Description );
+				VyattaConfigRouting.AddStaticRoute( ConfigRoot, Interfaces, Netmask, Target, Description );
 			}
 		}
 
-		public static VyattaConfigObject AddStaticRoute( VyattaConfigObject ConfigRoot, string Network, string TargetIP, string Description )
+		public static VyattaConfigObject AddStaticRoute( VyattaConfigObject ConfigRoot, List<InterfaceMapping> Interfaces, string Network, string Target, string Description )
 		{
 			if( Network.Contains( "-" ) )
 			{
 				Network = VyattaConfigUtil.IPRangeToCIDR( Network );
 			}
 
-			VyattaConfigObject Route = ConfigRoot.AddObject( string.Format( "protocols:static:route {0}:next-hop {1}", Network, TargetIP ) );
+			foreach( var Int in Interfaces )
+			{
+				if(	   ( Int.Description == Target || Int.Interface == Target )
+					&& Int.Gateway != null )
+				{
+					Target = Int.Gateway;
+					break;
+				}
+			}
+
+
+			VyattaConfigObject Route = ConfigRoot.AddObject( string.Format( "protocols:static:route {0}:next-hop {1}", Network, Target ) );
 			Route.AddAttribute( "description" ).Add( Description );
 			return Route;
 		}

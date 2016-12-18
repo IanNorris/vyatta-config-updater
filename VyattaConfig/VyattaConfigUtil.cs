@@ -40,7 +40,7 @@ namespace vyatta_config_updater.VyattaConfig
 		public static void WriteToFile( VyattaConfigNode Root, string TargetFilename )
 		{
 			StringBuilder SB = new StringBuilder();
-
+			
 			Root.ToString( SB, -1 );
 
 			using (TextWriter FileOut = new StreamWriter( TargetFilename ))
