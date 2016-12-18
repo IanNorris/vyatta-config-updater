@@ -29,6 +29,8 @@ namespace vyatta_config_updater
 
 		public Main( string Address, string Username, string Password, string ConfigPath )
 		{
+			InitializeComponent();
+
 			string Errors = "";
 			VyattaConfigObject Root = VyattaConfigUtil.ReadFromFile( ConfigPath, ref Errors );
 			

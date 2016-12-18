@@ -28,19 +28,75 @@
         /// </summary>
         private void InitializeComponent()
         {
-			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-			this.label1 = new System.Windows.Forms.Label();
-			this.label2 = new System.Windows.Forms.Label();
-			this.label3 = new System.Windows.Forms.Label();
-			this.Address = new System.Windows.Forms.TextBox();
-			this.Username = new System.Windows.Forms.TextBox();
 			this.Password = new System.Windows.Forms.TextBox();
+			this.Username = new System.Windows.Forms.TextBox();
+			this.Address = new System.Windows.Forms.TextBox();
+			this.label3 = new System.Windows.Forms.Label();
+			this.label2 = new System.Windows.Forms.Label();
+			this.label1 = new System.Windows.Forms.Label();
+			this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+			this.SavePassword = new System.Windows.Forms.CheckBox();
 			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
 			this.Cancel = new System.Windows.Forms.Button();
 			this.OK = new System.Windows.Forms.Button();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.flowLayoutPanel1.SuspendLayout();
 			this.SuspendLayout();
+			// 
+			// Password
+			// 
+			this.Password.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.Password.Location = new System.Drawing.Point(251, 67);
+			this.Password.Name = "Password";
+			this.Password.Size = new System.Drawing.Size(230, 20);
+			this.Password.TabIndex = 2;
+			this.Password.UseSystemPasswordChar = true;
+			// 
+			// Username
+			// 
+			this.Username.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.Username.Location = new System.Drawing.Point(251, 41);
+			this.Username.Name = "Username";
+			this.Username.Size = new System.Drawing.Size(230, 20);
+			this.Username.TabIndex = 1;
+			// 
+			// Address
+			// 
+			this.Address.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.Address.Location = new System.Drawing.Point(251, 15);
+			this.Address.Name = "Address";
+			this.Address.Size = new System.Drawing.Size(230, 20);
+			this.Address.TabIndex = 0;
+			// 
+			// label3
+			// 
+			this.label3.AutoSize = true;
+			this.label3.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.label3.Location = new System.Drawing.Point(15, 64);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(230, 26);
+			this.label3.TabIndex = 2;
+			this.label3.Text = "Password:";
+			// 
+			// label2
+			// 
+			this.label2.AutoSize = true;
+			this.label2.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.label2.Location = new System.Drawing.Point(15, 38);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(230, 26);
+			this.label2.TabIndex = 1;
+			this.label2.Text = "Username:";
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.label1.Location = new System.Drawing.Point(15, 12);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(230, 26);
+			this.label1.TabIndex = 0;
+			this.label1.Text = "Router IP:";
 			// 
 			// tableLayoutPanel1
 			// 
@@ -54,73 +110,30 @@
 			this.tableLayoutPanel1.Controls.Add(this.Address, 1, 0);
 			this.tableLayoutPanel1.Controls.Add(this.Username, 1, 1);
 			this.tableLayoutPanel1.Controls.Add(this.Password, 1, 2);
-			this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel1, 1, 3);
+			this.tableLayoutPanel1.Controls.Add(this.SavePassword, 1, 3);
+			this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel1, 1, 4);
 			this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
 			this.tableLayoutPanel1.Name = "tableLayoutPanel1";
 			this.tableLayoutPanel1.Padding = new System.Windows.Forms.Padding(12);
-			this.tableLayoutPanel1.RowCount = 4;
+			this.tableLayoutPanel1.RowCount = 5;
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel1.Size = new System.Drawing.Size(496, 126);
+			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+			this.tableLayoutPanel1.Size = new System.Drawing.Size(496, 161);
 			this.tableLayoutPanel1.TabIndex = 0;
 			// 
-			// label1
+			// SavePassword
 			// 
-			this.label1.AutoSize = true;
-			this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.label1.Location = new System.Drawing.Point(15, 12);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(230, 26);
-			this.label1.TabIndex = 0;
-			this.label1.Text = "Router IP:";
-			// 
-			// label2
-			// 
-			this.label2.AutoSize = true;
-			this.label2.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.label2.Location = new System.Drawing.Point(15, 38);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(230, 26);
-			this.label2.TabIndex = 1;
-			this.label2.Text = "Username:";
-			// 
-			// label3
-			// 
-			this.label3.AutoSize = true;
-			this.label3.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.label3.Location = new System.Drawing.Point(15, 64);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(230, 26);
-			this.label3.TabIndex = 2;
-			this.label3.Text = "Password:";
-			// 
-			// Address
-			// 
-			this.Address.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.Address.Location = new System.Drawing.Point(251, 15);
-			this.Address.Name = "Address";
-			this.Address.Size = new System.Drawing.Size(230, 20);
-			this.Address.TabIndex = 0;
-			// 
-			// Username
-			// 
-			this.Username.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.Username.Location = new System.Drawing.Point(251, 41);
-			this.Username.Name = "Username";
-			this.Username.Size = new System.Drawing.Size(230, 20);
-			this.Username.TabIndex = 1;
-			// 
-			// Password
-			// 
-			this.Password.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.Password.Location = new System.Drawing.Point(251, 67);
-			this.Password.Name = "Password";
-			this.Password.Size = new System.Drawing.Size(230, 20);
-			this.Password.TabIndex = 2;
-			this.Password.UseSystemPasswordChar = true;
+			this.SavePassword.AutoSize = true;
+			this.SavePassword.Location = new System.Drawing.Point(251, 93);
+			this.SavePassword.Name = "SavePassword";
+			this.SavePassword.Size = new System.Drawing.Size(193, 17);
+			this.SavePassword.TabIndex = 7;
+			this.SavePassword.Text = "Save password (not recommended)";
+			this.SavePassword.UseVisualStyleBackColor = true;
 			// 
 			// flowLayoutPanel1
 			// 
@@ -130,9 +143,9 @@
 			this.flowLayoutPanel1.Controls.Add(this.OK);
 			this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
-			this.flowLayoutPanel1.Location = new System.Drawing.Point(251, 93);
+			this.flowLayoutPanel1.Location = new System.Drawing.Point(251, 116);
 			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-			this.flowLayoutPanel1.Size = new System.Drawing.Size(230, 100);
+			this.flowLayoutPanel1.Size = new System.Drawing.Size(230, 30);
 			this.flowLayoutPanel1.TabIndex = 6;
 			// 
 			// Cancel
@@ -164,7 +177,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
 			this.CancelButton = this.Cancel;
-			this.ClientSize = new System.Drawing.Size(496, 126);
+			this.ClientSize = new System.Drawing.Size(496, 161);
 			this.Controls.Add(this.tableLayoutPanel1);
 			this.MaximizeBox = false;
 			this.Name = "Login";
@@ -177,18 +190,19 @@
 
         }
 
-        #endregion
+		#endregion
 
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox Address;
-        private System.Windows.Forms.TextBox Username;
-        private System.Windows.Forms.TextBox Password;
-        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
-        private System.Windows.Forms.Button Cancel;
-        private System.Windows.Forms.Button OK;
-    }
+		private System.Windows.Forms.TextBox Password;
+		private System.Windows.Forms.TextBox Username;
+		private System.Windows.Forms.TextBox Address;
+		private System.Windows.Forms.Label label3;
+		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+		private System.Windows.Forms.Button Cancel;
+		private System.Windows.Forms.Button OK;
+		private System.Windows.Forms.CheckBox SavePassword;
+	}
 }
 

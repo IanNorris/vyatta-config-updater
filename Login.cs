@@ -16,7 +16,6 @@ namespace vyatta_config_updater
 	public partial class Login : Form
 	{
 		const string RegistryKey = @"SOFTWARE\VyattaConfigUpdater";
-		string Fingerprint = "";
 		bool ProgrammaticClosing = false;
 
 		public Login()
@@ -24,9 +23,16 @@ namespace vyatta_config_updater
 			InitializeComponent();
 
 			Microsoft.Win32.RegistryKey regSettings = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegistryKey);
-			Address.Text = (string)regSettings.GetValue("Address");
-			Username.Text = (string)regSettings.GetValue("Username");
-			Fingerprint = (string)regSettings.GetValue("Fingerprint");
+			Address.Text = (string)regSettings.GetValue( "Address", "" );
+			Username.Text = (string)regSettings.GetValue( "Username", "" );
+			SavePassword.Checked = (string)regSettings.GetValue( "SavePassword", "False" ) == "True";
+
+			string EncryptedPassword = (string)regSettings.GetValue("Password");
+			if( EncryptedPassword != null && EncryptedPassword.Length > 0 )
+			{
+				Password.Text = Util.DecryptString( EncryptedPassword );
+			}
+			
 			regSettings.Close();
 
 			if( Username.Text.Length > 0 )
@@ -53,35 +59,28 @@ namespace vyatta_config_updater
 
 		private void OK_Click( object sender, EventArgs e )
 		{
-			try
+			var Busy = new Busy( Address.Text, Username.Text, Password.Text );
+			if( Busy.ShowDialog() == DialogResult.OK )
 			{
-				using( ScpClient client = new ScpClient( Address.Text, Username.Text, Password.Text ) )
+				Microsoft.Win32.RegistryKey regSettings = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegistryKey);
+				regSettings.SetValue( "Address", Address.Text );
+				regSettings.SetValue( "Username", Username.Text );
+				regSettings.SetValue( "SavePassword", SavePassword.Checked ? "True" : "False" );
+				if( SavePassword.Checked )
 				{
-					client.Connect();
-
-					string tempConfigPath = Path.ChangeExtension(Path.GetTempFileName(), Guid.NewGuid().ToString());
-
-					using( Stream tempFile = new FileStream( tempConfigPath, FileMode.CreateNew ) )
-					{
-						client.Download( "/config/config.boot", tempFile );
-					}
-
-					client.Disconnect();
-
-					var MainForm = new Main( Address.Text, Username.Text, Password.Text, tempConfigPath );
-					Visible = false;
-					MainForm.Show();
-					ProgrammaticClosing = true;
-					Close();
+					regSettings.SetValue( "Password", Util.EncryptString( Password.Text ) );
 				}
-			}
-			catch( SshException exception )
-			{
-				MessageBox.Show( exception.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error );
-			}
-			catch( IOException exception )
-			{
-				MessageBox.Show( exception.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error );
+				else
+				{
+					regSettings.DeleteValue( "Password", false );
+				}
+				regSettings.Close();
+
+				var MainForm = new Main( Address.Text, Username.Text, Password.Text, Busy.GetTempPath() );
+				Visible = false;
+				MainForm.Show();
+				ProgrammaticClosing = true;
+				Close();
 			}
 		}
 	}

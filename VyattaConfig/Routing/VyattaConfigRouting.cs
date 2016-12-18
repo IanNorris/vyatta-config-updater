@@ -8,6 +8,16 @@ namespace vyatta_config_updater.VyattaConfig.Routing
 {
 	public static class VyattaConfigRouting
 	{
+		public static void AddStaticRoutesForASN( VyattaConfigObject ConfigRoot, uint ASN )
+		{
+			//TODO
+		}
+
+		public static void AddStaticRoutesForOrganization( VyattaConfigObject ConfigRoot, string OrganizationSubstring )
+		{
+			//TODO
+		}
+
 		public static VyattaConfigObject AddStaticRoute( VyattaConfigObject ConfigRoot, string Network, string TargetIP, string Description )
 		{
 			if( Network.Contains( "-" ) )

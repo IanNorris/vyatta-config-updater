@@ -17,8 +17,8 @@ namespace vyatta_config_updater
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault( false );
 
-			//var BootForm = new Login();
-			var BootForm = new Main( "", "", "", @"X:\ExampleVyattaConfig.txt");
+			var BootForm = new Login();
+			//var BootForm = new Main( "", "", "", @"X:\ExampleVyattaConfig.txt");
 			BootForm.Show();
 
 			Application.Run();
