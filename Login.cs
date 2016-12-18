@@ -61,7 +61,10 @@ namespace vyatta_config_updater
 		{
 			RouterLogin Login = new RouterLogin( Address.Text, Username.Text, Password.Text );
 
-			var Busy = new Busy( Login );
+			ChainWorker Work = new ChainWorker();
+			Work.AddWork( Login );
+
+			var Busy = new Busy( Work );
 			if( Busy.ShowDialog() == DialogResult.OK )
 			{
 				Microsoft.Win32.RegistryKey regSettings = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegistryKey);

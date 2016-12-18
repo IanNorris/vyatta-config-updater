@@ -75,11 +75,15 @@ namespace vyatta_config_updater
 			return Response;
 		}
 
-		public bool DoWork( Util.UpdateStatusDelegate SetStatus )
+		public bool DoWork( Util.UpdateStatusDelegate SetStatus, Util.ShouldCancelDelegate ShouldCancel )
 		{
+			if( ShouldCancel() ) { return false; }
+
 			using( SshClient Client = new SshClient( Address, Username, Password ) )
 			{
 				Client.Connect();
+
+				if( ShouldCancel() ) { return false; }
 
 				//Verify that we can identify the device
 
@@ -90,6 +94,8 @@ namespace vyatta_config_updater
 				{
 					throw new Exception( "The device is not running EdgeOS and is not supported. Device ");
 				}
+
+				if( ShouldCancel() ) { return false; }
 
 				/*//Enter configure mode
 
@@ -114,20 +120,26 @@ namespace vyatta_config_updater
 				Client.Disconnect();
 			}
 
-			SetStatus( "Connecting over SCP...", 0 );
+			SetStatus( "Connecting over SCP...", 60 );
+
+			if( ShouldCancel() ) { return false; }
 
 			using( ScpClient Client = new ScpClient( Address, Username, Password ) )
 			{
 				Client.Connect();
 
-				SetStatus( "Downloading config...", 10 );
+				if( ShouldCancel() ) { return false; }
+
+				SetStatus( "Downloading config...", 80 );
 
 				using( Stream tempFile = new FileStream( TempPath, FileMode.CreateNew ) )
 				{
 					Client.Download( "/config/config.boot", tempFile );
 				}
 
-				SetStatus( "Disconnecting...", 10 );
+				if( ShouldCancel() ) { return false; }
+
+				SetStatus( "Disconnecting...", 90 );
 
 				Client.Disconnect();
 			}

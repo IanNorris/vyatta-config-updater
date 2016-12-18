@@ -57,6 +57,7 @@
       <DependentUpon>Busy.cs</DependentUpon>
     </Compile>
     <Compile Include="BusyWorkInterface.cs" />
+    <Compile Include="ChainWorker.cs" />
     <Compile Include="Login.cs">
       <SubType>Form</SubType>
     </Compile>

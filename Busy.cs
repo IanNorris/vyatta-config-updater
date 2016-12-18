@@ -45,14 +45,19 @@ namespace vyatta_config_updater
 		{
 			SetStatus( "Connecting over SSH...", 0 );
 
-			Util.UpdateStatusDelegate Delegate = ( string NewStatus, int NewProgress ) =>
+			Util.UpdateStatusDelegate SetStatusDelegate = ( string NewStatus, int NewProgress ) =>
 			{
 				SetStatus( NewStatus, NewProgress );
 			};
 
+			Util.ShouldCancelDelegate CancelDelegate = () =>
+			{
+				return BusyBackgroundWorker.CancellationPending;
+			};
+
 			try
 			{
-				if( Work.DoWork( Delegate ) )
+				if( Work.DoWork( SetStatusDelegate, CancelDelegate ) )
 				{
 					Completed = true;
 				}

@@ -12,6 +12,7 @@ namespace vyatta_config_updater
 	public class Util
 	{
 		public delegate void UpdateStatusDelegate( string NewStatus, int NewProgress );
+		public delegate bool ShouldCancelDelegate();
 		public delegate bool DoWorkDelegate( UpdateStatusDelegate SetStatus );
 
 		//Crypto functions based on answer by Brett
