@@ -8,14 +8,16 @@ namespace vyatta_config_updater.VyattaConfig.Routing
 {
 	public static class VyattaConfigRouting
 	{
-		public static void AddStaticRoutesForASN( VyattaConfigObject ConfigRoot, uint ASN )
+		public static void AddStaticRoutesForOrganization( VyattaConfigObject ConfigRoot, string OrganizationSubstring, ASNData ASNData, string TargetIP )
 		{
-			//TODO
-		}
+			var Netmasks = ASNData.GetNetmasksFromOrganization( OrganizationSubstring );
+			
+			string Description = string.Format( "VCU-Auto: {0}", OrganizationSubstring );
 
-		public static void AddStaticRoutesForOrganization( VyattaConfigObject ConfigRoot, string OrganizationSubstring )
-		{
-			//TODO
+			foreach( var Netmask in Netmasks )
+			{
+				VyattaConfigRouting.AddStaticRoute( ConfigRoot, Netmask, TargetIP, Description );
+			}
 		}
 
 		public static VyattaConfigObject AddStaticRoute( VyattaConfigObject ConfigRoot, string Network, string TargetIP, string Description )

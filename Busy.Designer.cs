@@ -55,7 +55,7 @@ namespace vyatta_config_updater
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
 			this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-			this.tableLayoutPanel1.Size = new System.Drawing.Size(308, 67);
+			this.tableLayoutPanel1.Size = new System.Drawing.Size(439, 67);
 			this.tableLayoutPanel1.TabIndex = 0;
 			// 
 			// Progress
@@ -64,7 +64,7 @@ namespace vyatta_config_updater
 			this.Progress.Location = new System.Drawing.Point(3, 3);
 			this.Progress.MaximumSize = new System.Drawing.Size(0, 20);
 			this.Progress.Name = "Progress";
-			this.Progress.Size = new System.Drawing.Size(302, 20);
+			this.Progress.Size = new System.Drawing.Size(433, 20);
 			this.Progress.TabIndex = 1;
 			this.Progress.Value = 30;
 			// 
@@ -76,7 +76,7 @@ namespace vyatta_config_updater
 			this.Status.AutoSize = true;
 			this.Status.Location = new System.Drawing.Point(3, 26);
 			this.Status.Name = "Status";
-			this.Status.Size = new System.Drawing.Size(302, 13);
+			this.Status.Size = new System.Drawing.Size(433, 13);
 			this.Status.TabIndex = 2;
 			this.Status.Text = "Connecting...";
 			this.Status.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -85,7 +85,7 @@ namespace vyatta_config_updater
 			// 
 			this.Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
 			this.Cancel.Dock = System.Windows.Forms.DockStyle.Right;
-			this.Cancel.Location = new System.Drawing.Point(230, 42);
+			this.Cancel.Location = new System.Drawing.Point(361, 42);
 			this.Cancel.Name = "Cancel";
 			this.Cancel.Size = new System.Drawing.Size(75, 23);
 			this.Cancel.TabIndex = 3;
@@ -106,7 +106,7 @@ namespace vyatta_config_updater
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.CancelButton = this.Cancel;
-			this.ClientSize = new System.Drawing.Size(324, 83);
+			this.ClientSize = new System.Drawing.Size(455, 83);
 			this.Controls.Add(this.tableLayoutPanel1);
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;

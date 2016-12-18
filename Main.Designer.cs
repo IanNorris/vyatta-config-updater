@@ -27,7 +27,7 @@ namespace vyatta_config_updater
 			base.Dispose( disposing );
 		}
 
-		public Main( string Address, string Username, string Password, string ConfigPath )
+		public Main( string Address, string Username, string Password, string ConfigPath, ASNData ASNData )
 		{
 			InitializeComponent();
 
@@ -38,13 +38,31 @@ namespace vyatta_config_updater
 			//CIDR: 23.246.0.0/19
 
 			VyattaConfigRouting.DeleteStaticRoute( Root, "104.27.200.0/22" );
-			VyattaConfigRouting.AddStaticRoute( Root, "23.246.0.0-23.246.31.255", "192.168.72.1", "Netflix" );
+			
+			VyattaConfigRouting.AddStaticRoutesForOrganization( Root, "Netflix", ASNData, "192.168.72.1" );
+			VyattaConfigRouting.AddStaticRoutesForOrganization( Root, "BBC", ASNData, "192.168.72.1" );
+			VyattaConfigRouting.AddStaticRoutesForOrganization( Root, "Valve", ASNData, "192.168.72.1" );
+			VyattaConfigRouting.AddStaticRoutesForOrganization( Root, "Nest", ASNData, "192.168.72.1" );
 			
 			string tempOutputConfigPath = Path.ChangeExtension(Path.GetTempFileName(), Guid.NewGuid().ToString());
 
 			VyattaConfigUtil.WriteToFile( Root, tempOutputConfigPath );
 
-			Process.Start( @"C:\Program Files (x86)\WinMerge\WinMergeU.exe", string.Format( "\"{0}\" \"{1}\"", ConfigPath, tempOutputConfigPath ) );
+			var Proc = Process.Start( @"C:\Program Files (x86)\WinMerge\WinMergeU.exe", string.Format( "\"{0}\" \"{1}\"", ConfigPath, tempOutputConfigPath ) );
+			Proc.WaitForExit();
+
+			if( MessageBox.Show( "Upload new config?", "Are you sure?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question ) == DialogResult.Yes )
+			{
+				var Busy = new Busy( new RouterWriteNewConfig( Address, Username, Password, tempOutputConfigPath ) );
+				if( Busy.ShowDialog() == DialogResult.OK )
+				{
+					MessageBox.Show( "New config has been uploaded.\nYour router will now reload the config.", "Success!", MessageBoxButtons.OK, MessageBoxIcon.Information );
+				}
+				else
+				{
+					MessageBox.Show( "Error uploading new config..", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error );
+				}
+			}
 		}
 
 		protected override void OnFormClosing(FormClosingEventArgs e)

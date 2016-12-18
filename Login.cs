@@ -49,10 +49,14 @@ namespace vyatta_config_updater
 
 		private void OK_Click( object sender, EventArgs e )
 		{
-			RouterLogin Login = new RouterLogin( Address.Text, Username.Text, Password.Text );
+			ASNData ASNData = new ASNData();
+
+			RouterLogin LoginWork = new RouterLogin( Address.Text, Username.Text, Password.Text );
+			AcquireASNData ASNDataWork = new AcquireASNData( ASNData );
 
 			ChainWorker Work = new ChainWorker();
-			Work.AddWork( Login );
+			Work.AddWork( ASNDataWork );
+			Work.AddWork( LoginWork );
 
 			var Busy = new Busy( Work );
 			if( Busy.ShowDialog() == DialogResult.OK )
@@ -71,7 +75,7 @@ namespace vyatta_config_updater
 				}
 				regSettings.Close();
 
-				var MainForm = new Main( Address.Text, Username.Text, Password.Text, Login.GetTempPath() );
+				var MainForm = new Main( Address.Text, Username.Text, Password.Text, LoginWork.GetTempPath(), ASNData );
 				Visible = false;
 				MainForm.Show();
 				ProgrammaticClosing = true;

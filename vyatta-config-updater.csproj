@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AcquireASNData.cs" />
     <Compile Include="Busy.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -73,6 +74,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RouterLogin.cs" />
+    <Compile Include="RouterWriteNewConfig.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="VyattaConfig\Routing\VyattaConfigRouting.cs" />
     <Compile Include="VyattaConfig\VyattaConfigUtil.cs" />

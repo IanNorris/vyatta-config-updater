@@ -123,12 +123,34 @@ namespace vyatta_config_updater.VyattaConfig
 			if( Split.Length == 2 )
 			{
 				var NewNode = new VyattaConfigObject( new VyattaConfigAttribute(Split[0]) );
+
+				foreach( var Child in Children )
+				{
+					//If we've already got that attribute
+					if( Child.GetName() == Split[1].Split( new char[] { ' ' }, 2 )[0] )
+					{
+						Children.Remove( Child );
+						break;
+					}
+				}
+
 				Children.Add( NewNode );
 				return NewNode.AddAttribute( Split[1] );
 			}
 			else
 			{
 				var NewNode = new VyattaConfigAttribute(Split[0]);
+
+				foreach( var Child in Children )
+				{
+					//If we've already got that attribute
+					if( Child.GetName() == Split[0].Split( new char[] { ' ' }, 2 )[0] )
+					{
+						Children.Remove( Child );
+						break;
+					}
+				}
+
 				Children.Add( NewNode );
 				return NewNode;
 			}
@@ -142,7 +164,14 @@ namespace vyatta_config_updater.VyattaConfig
 			{
 				if( ChildNode.GetAttributeString() == Split[0] )
 				{
-					return ChildNode.AddObject( Split[1] );
+					if( Split.Length == 2 )
+					{
+						return ChildNode.AddObject( Split[1] );
+					}
+					else
+					{
+						return ChildNode as VyattaConfigObject;
+					}
 				}
 			}
 
