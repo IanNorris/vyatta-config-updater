@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using Renci.SshNet;
-using Renci.SshNet.Common;
 
 namespace vyatta_config_updater
 {
@@ -101,17 +100,17 @@ namespace vyatta_config_updater
 		{
 			if( ShouldCancel() ) { return false; }
 
-			using( SshClient Client = new SshClient( Address, Username, Password ) )
-			{
-				Client.Connect();
+			SetStatus( "Connecting to SSH...", 0 );
 
+			using( VyattaShell Shell = new VyattaShell( Address, Username, Password ) )
+			{
 				if( ShouldCancel() ) { return false; }
 
 				//Verify that we can identify the device
 
 				SetStatus( "Identifying device...", 5 );
 					
-				var Version = RunCommand( Client, "cat /proc/version" );
+				var Version = Shell.RunCommand( "cat /proc/version" );
 				if( !Version.Contains( "edgeos" ) )
 				{
 					throw new Exception( "The device is not running EdgeOS and is not supported. Device ");
@@ -120,73 +119,58 @@ namespace vyatta_config_updater
 				if( ShouldCancel() ) { return false; }
 
 				//Enter configure mode
+				
+				SetStatus( "Processing routing interfaces...", 8 );
 
-				var TermOptions = new Dictionary<TerminalModes,uint>();
-				TermOptions.Add( TerminalModes.ECHO, 0 );
+				string ShowRoutes = Shell.RunCommand( "show ip route" );
 
-				SetStatus( "Creating shell...", 10 );
+				Regex ParseGatewayRoutes = new Regex( @"\w\s+\*\>\s+([0-9.]+)\/(\d+)\s+\[\d+\/\d+\] via ([0-9.\/]+), (\w+)" );
 
-				using( ShellStream Shell = Client.CreateShellStream( "bash", 80, 24, 800, 600, 64 * 1024, TermOptions ) )
-				{
-					string Initial = Shell.Expect(new Regex(@"[$>]"));
-					System.Console.Out.WriteLine( Initial );
-
-					SetStatus( "Processing routing interfaces...", 8 );
-
-					string ShowRoutes = RunShellCommand( Shell, "show ip route", false );
-
-					Regex ParseGatewayRoutes = new Regex( @"\w\s+\*\>\s+([0-9.]+)\/(\d+)\s+\[\d+\/\d+\] via ([0-9.\/]+), (\w+)" );
-
-					Dictionary<string, string> Gateways = new Dictionary<string, string>();
+				Dictionary<string, string> Gateways = new Dictionary<string, string>();
 					
-					string[] RouteLines = ShowRoutes.Split( new char[] { '\n' } );
-					foreach( string Line in RouteLines )
+				string[] RouteLines = ShowRoutes.Split( new char[] { '\n' } );
+				foreach( string Line in RouteLines )
+				{
+					Match Match = ParseGatewayRoutes.Match( Line );
+					if( Match.Success )
 					{
-						Match Match = ParseGatewayRoutes.Match( Line );
-						if( Match.Success )
+						//Only match gateways to the internet
+						if( Match.Groups[1].Value == "0.0.0.0" && (Match.Groups[2].Value == "0" || Match.Groups[2].Value == "1") )
 						{
-							//Only match gateways to the internet
-							if( Match.Groups[1].Value == "0.0.0.0" && (Match.Groups[2].Value == "0" || Match.Groups[2].Value == "1") )
-							{
-								Gateways[Match.Groups[4].Value] = Match.Groups[3].Value;
-							}
+							Gateways[Match.Groups[4].Value] = Match.Groups[3].Value;
 						}
 					}
-
-					SetStatus( "Processing interface list...", 16 );
-					string ShowInterfaces = RunShellCommand( Shell, "show interfaces", false );
-
-					Regex ParseInterfaces = new Regex( @"(\w+)\s+([0-9.\-]+(:?\/[0-9]+)?)\s+(\w\/\w)\s+(\w+)?" );
-
-					Interfaces = new List<InterfaceMapping>();
-
-					string[] InterfaceLines = ShowInterfaces.Split( new char[] { '\n' } );
-					foreach( string Line in InterfaceLines )
-					{
-						Match Match = ParseInterfaces.Match( Line );
-						if( Match.Success )
-						{
-							InterfaceMapping Mapping = new InterfaceMapping();
-
-							Mapping.Interface = Match.Groups[1].Value;
-							Mapping.IPAddress = Match.Groups[2].Value == "-" ? "" : Match.Groups[2].Value;
-							Mapping.Codes = Match.Groups[4].Value;
-							Mapping.Description = Match.Groups[5].Value;
-
-							string Gateway;
-							if( Gateways.TryGetValue( Mapping.Interface, out Gateway ))
-							{
-								Mapping.Gateway = Gateway;
-							}
-
-							Interfaces.Add( Mapping );
-						}
-					}	
 				}
 
-				SetStatus( "Disconnecting from SSH...", 50 );
+				SetStatus( "Processing interface list...", 16 );
+				string ShowInterfaces = Shell.RunCommand( "show interfaces" );
 
-				Client.Disconnect();
+				Regex ParseInterfaces = new Regex( @"(\w+)\s+([0-9.\-]+(:?\/[0-9]+)?)\s+(\w\/\w)\s+(\w+)?" );
+
+				Interfaces = new List<InterfaceMapping>();
+
+				string[] InterfaceLines = ShowInterfaces.Split( new char[] { '\n' } );
+				foreach( string Line in InterfaceLines )
+				{
+					Match Match = ParseInterfaces.Match( Line );
+					if( Match.Success )
+					{
+						InterfaceMapping Mapping = new InterfaceMapping();
+
+						Mapping.Interface = Match.Groups[1].Value;
+						Mapping.IPAddress = Match.Groups[2].Value == "-" ? "" : Match.Groups[2].Value;
+						Mapping.Codes = Match.Groups[4].Value;
+						Mapping.Description = Match.Groups[5].Value;
+
+						string Gateway;
+						if( Gateways.TryGetValue( Mapping.Interface, out Gateway ))
+						{
+							Mapping.Gateway = Gateway;
+						}
+
+						Interfaces.Add( Mapping );
+					}
+				}
 			}
 
 			SetStatus( "Connecting over SCP...", 60 );

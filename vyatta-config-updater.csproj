@@ -87,6 +87,7 @@
     <Compile Include="VyattaConfig\VyattaConfigObject.cs" />
     <Compile Include="VyattaConfig\VyattaConfigParser.cs" />
     <Compile Include="VyattaConfig\VyattaConfigValue.cs" />
+    <Compile Include="VyattaShell.cs" />
     <EmbeddedResource Include="Busy.resx">
       <DependentUpon>Busy.cs</DependentUpon>
     </EmbeddedResource>

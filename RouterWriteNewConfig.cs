@@ -63,65 +63,50 @@ namespace vyatta_config_updater
 
 		public bool DoWork( Util.UpdateStatusDelegate SetStatus, Util.ShouldCancelDelegate ShouldCancel )
 		{
-			using( SshClient Client = new SshClient( Address, Username, Password ) )
+			SetStatus( "Connecting to SSH...", 0 );
+
+			using( VyattaShell Shell = new VyattaShell( Address, Username, Password ) )
 			{
-				Client.Connect();
 
-				//Enter configure mode
+				SetStatus( "Entering configure mode...", 8 );
+				Shell.RunCommand( "configure" );
 
-				var TermOptions = new Dictionary<TerminalModes,uint>();
-				TermOptions.Add( TerminalModes.ECHO, 0 );
-
-				SetStatus( "Creating shell...", 10 );
-
-				using( ShellStream Shell = Client.CreateShellStream( "bash", 80, 24, 800, 600, 64 * 1024, TermOptions ) )
+				if( !ShouldCancel() )
 				{
-					string Initial = Shell.Expect(new Regex(@"[$>]"));
-					System.Console.Out.WriteLine( Initial );
-
-					SetStatus( "Entering configure mode...", 8 );
-					RunShellCommand( Shell, "configure", true );
-
-					if( !ShouldCancel() )
+					using( ScpClient ScpClient = new ScpClient( Address, Username, Password ) )
 					{
-						using( ScpClient ScpClient = new ScpClient( Address, Username, Password ) )
+						ScpClient.Connect();
+
+						SetStatus( "Uploading new config...", 15 );
+
+						if( !ShouldCancel() )
 						{
-							ScpClient.Connect();
-
-							SetStatus( "Uploading new config...", 15 );
-
-							if( !ShouldCancel() )
+							using( Stream configFile = new FileStream( NewConfig, FileMode.Open ) )
 							{
-								using( Stream configFile = new FileStream( NewConfig, FileMode.Open ) )
-								{
-									ScpClient.Upload( configFile, "/config/config.boot" );
-								}
+								ScpClient.Upload( configFile, "/config/config.boot" );
 							}
-
-							SetStatus( "Disconnecting SCP...", 20 );
-
-							ScpClient.Disconnect();
 						}
+
+						SetStatus( "Disconnecting SCP...", 20 );
+
+						ScpClient.Disconnect();
 					}
-
-					SetStatus( "Loading new config...", 25 );
-
-					RunShellCommand( Shell, "load", true );
-
-					SetStatus( "Comparing config...", 35 );
-					RunShellCommand( Shell, "compare", true );
-
-					SetStatus( "Committing new config (this will take a while)...", 45 );
-					RunShellCommand( Shell, "commit", true );
-
-					SetStatus( "Committing new config (this will take a while)...", 95 );
-					RunShellCommand( Shell, "exit", false );
-						
 				}
 
-				SetStatus( "Disconnecting from SSH...", 98 );
+				SetStatus( "Loading new config...", 25 );
 
-				Client.Disconnect();
+				Shell.RunCommand( "load" );
+
+				SetStatus( "Comparing config...", 35 );
+				Shell.RunCommand( "compare" );
+
+				SetStatus( "Committing new config (this will take a while)...", 45 );
+				Shell.RunCommand( "commit" );
+
+				SetStatus( "Committing new config (this will take a while)...", 95 );
+				Shell.RunCommand( "exit" );
+
+				SetStatus( "Disconnecting from SSH...", 98 );
 			}
 			
 			SetStatus( "Completed.", 100 );
