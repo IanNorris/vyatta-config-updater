@@ -3,26 +3,24 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using Renci.SshNet;
+using Renci.SshNet.Common;
+using vyatta_config_updater.VyattaConfig;
 
 namespace vyatta_config_updater
 {
 	public class RouterLogin : BusyWorkInterface
 	{
 		private string TempPath;
+		private string TempTemplatePath;
 
-		private string Address;
-		private string Username;
-		private string Password;
+		private RouterData Data;
 
-		private List<InterfaceMapping> Interfaces;
-
-		public RouterLogin( string Address, string Username, string Password )
+		public RouterLogin( RouterData Data )
 		{
-			this.Address = Address;
-			this.Username = Username;
-			this.Password = Password;
+			this.Data = Data;
 			
 			TempPath = Path.ChangeExtension(Path.GetTempFileName(), Guid.NewGuid().ToString());
+			TempTemplatePath = Path.ChangeExtension(Path.GetTempFileName(), Guid.NewGuid().ToString());
 		}
 
 		public string GetTempPath()
@@ -30,9 +28,9 @@ namespace vyatta_config_updater
 			return TempPath;
 		}
 
-		public List<InterfaceMapping> GetInterfaces()
+		public string GetTempTemplatePath()
 		{
-			return Interfaces;
+			return TempTemplatePath;
 		}
 
 		private string RunCommand( SshClient Client, string CommandLine )
@@ -102,7 +100,7 @@ namespace vyatta_config_updater
 
 			SetStatus( "Connecting to SSH...", 0 );
 
-			using( VyattaShell Shell = new VyattaShell( Address, Username, Password ) )
+			using( VyattaShell Shell = new VyattaShell( Data.Address, Data.Username, Data.Password ) )
 			{
 				if( ShouldCancel() ) { return false; }
 
@@ -147,7 +145,7 @@ namespace vyatta_config_updater
 
 				Regex ParseInterfaces = new Regex( @"(\w+)\s+([0-9.\-]+(:?\/[0-9]+)?)\s+(\w\/\w)\s+(\w+)?" );
 
-				Interfaces = new List<InterfaceMapping>();
+				Data.Interfaces = new List<InterfaceMapping>();
 
 				string[] InterfaceLines = ShowInterfaces.Split( new char[] { '\n' } );
 				foreach( string Line in InterfaceLines )
@@ -168,7 +166,7 @@ namespace vyatta_config_updater
 							Mapping.Gateway = Gateway;
 						}
 
-						Interfaces.Add( Mapping );
+						Data.Interfaces.Add( Mapping );
 					}
 				}
 			}
@@ -177,7 +175,7 @@ namespace vyatta_config_updater
 
 			if( ShouldCancel() ) { return false; }
 
-			using( ScpClient Client = new ScpClient( Address, Username, Password ) )
+			using( ScpClient Client = new ScpClient( Data.Address, Data.Username, Data.Password ) )
 			{
 				Client.Connect();
 
@@ -190,9 +188,50 @@ namespace vyatta_config_updater
 					Client.Download( "/config/config.boot", tempFile );
 				}
 
+				SetStatus( "Parsing existing config...", 85 );
+
+				string Errors = "";
+				Data.OldConfigLines = File.ReadAllLines( TempPath );
+				Data.ConfigRoot = VyattaConfigUtil.ReadFromFile( TempPath, ref Errors );
+				if( Errors.Length > 0 )
+				{
+					throw new Exception( Errors );
+				}
+
+				SetStatus( "Downloading current template...", 90 );
+				
+				try
+				{
+					using( Stream tempTemplateFile = new FileStream( TempTemplatePath, FileMode.CreateNew ) )
+					{
+						Client.Download( "/config/vcu/current.vcu", tempTemplateFile );
+					}
+
+					SetStatus( "Parsing current template...", 95 );
+
+					Errors = "";
+					Data.TemplateRoot = VyattaConfigUtil.ReadFromFile( TempTemplatePath, ref Errors );
+					if( Errors.Length > 0 )
+					{
+						throw new Exception( Errors );
+					}
+				}
+				catch( SshException e )
+				{
+					if( !e.Message.Contains( "No such file or directory" ) )
+					{
+						throw e;
+					}
+
+					//It's quite okay to fail here, it means the user hasn't uploaded
+					//a config with the tool yet.
+
+					Data.TemplateRoot = new VyattaConfigObject( null );
+				}
+
 				if( ShouldCancel() ) { return false; }
 
-				SetStatus( "Disconnecting...", 90 );
+				SetStatus( "Disconnecting...", 98 );
 
 				Client.Disconnect();
 			}

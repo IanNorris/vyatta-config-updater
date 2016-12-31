@@ -50,16 +50,25 @@ namespace vyatta_config_updater
 			while( !End )
 			{
 				Stream.Expect(
+					//Regular bash prompt
 					new ExpectAction( new Regex(@"\w+@\w+\:[\w~\/\\]+\$"), (Input) =>
 					{
 						End = true;
 						Response += Input;
 					} ),
+					//Root bash prompt
 					new ExpectAction( new Regex(@"\w+@\w+\:[\w~\/\\]+#"), (Input) =>
 					{
 						End = true;
 						Response += Input;
 					} ),
+					//Vyatta configure prompt
+					new ExpectAction( new Regex(@"\w+@\w+#"), (Input) =>
+					{
+						End = true;
+						Response += Input;
+					} ),
+					//tail/head paging prompt
 					new ExpectAction( new Regex(@"\n\:"), (Input) =>
 					{
 						Response += Input;

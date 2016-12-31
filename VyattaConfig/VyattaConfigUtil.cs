@@ -9,6 +9,8 @@ namespace vyatta_config_updater.VyattaConfig
 {
 	public static class VyattaConfigUtil
 	{
+		public const string SortableDateFormat = "yyyy_MM_dd_HH_mm_ss";
+
 		public static string IndentString( int Indent )
 		{
 			if( Indent > 0 )
@@ -35,6 +37,20 @@ namespace vyatta_config_updater.VyattaConfig
 			Parser.Parse( ref Errors, Root );
 
 			return Root;
+		}
+
+		public static string WriteToString( VyattaConfigNode Root )
+		{
+			StringBuilder SB = new StringBuilder();
+			
+			Root.ToString( SB, -1 );
+
+			return SB.ToString();
+		}
+
+		public static System.String[] WriteToStringLines( VyattaConfigNode Root )
+		{
+			return WriteToString( Root ).Split( new char[] { '\n' } );
 		}
 
 		public static void WriteToFile( VyattaConfigNode Root, string TargetFilename )

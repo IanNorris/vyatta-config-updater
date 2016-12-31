@@ -33,6 +33,23 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AeroWizard, Version=2.1.7.0, Culture=neutral, PublicKeyToken=915e74f5d64b8f37, processorArchitecture=MSIL">
+      <HintPath>packages\AeroWizard.2.1.7\lib\net452\AeroWizard.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Menees.Common, Version=4.5.5691.31910, Culture=neutral, PublicKeyToken=5115291defa18758, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Meenes\Menees.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Menees.Diffs">
+      <HintPath>Meenes\Menees.Diffs.dll</HintPath>
+    </Reference>
+    <Reference Include="Menees.Diffs.Controls">
+      <HintPath>Meenes\Menees.Diffs.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="Menees.Windows.Forms">
+      <HintPath>Meenes\Menees.Windows.Forms.dll</HintPath>
+    </Reference>
     <Reference Include="Renci.SshNet, Version=2016.0.0.0, Culture=neutral, PublicKeyToken=1cee9f8bde3db106, processorArchitecture=MSIL">
       <HintPath>packages\SSH.NET.2016.0.0\lib\net40\Renci.SshNet.dll</HintPath>
       <Private>True</Private>
@@ -51,6 +68,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AcquireASNData.cs" />
+    <Compile Include="AddStaticRouteWizard.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddStaticRouteWizard.Designer.cs">
+      <DependentUpon>AddStaticRouteWizard.cs</DependentUpon>
+    </Compile>
     <Compile Include="Busy.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -74,9 +97,11 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RouterData.cs" />
     <Compile Include="RouterGenerateNewConfig.cs" />
     <Compile Include="RouterLogin.cs" />
     <Compile Include="RouterWriteNewConfig.cs" />
+    <Compile Include="StaticRoutingData.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="VyattaConfig\Routing\VyattaConfigRouting.cs" />
     <Compile Include="VyattaConfig\VyattaConfigUtil.cs" />
@@ -88,6 +113,9 @@
     <Compile Include="VyattaConfig\VyattaConfigParser.cs" />
     <Compile Include="VyattaConfig\VyattaConfigValue.cs" />
     <Compile Include="VyattaShell.cs" />
+    <EmbeddedResource Include="AddStaticRouteWizard.resx">
+      <DependentUpon>AddStaticRouteWizard.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Busy.resx">
       <DependentUpon>Busy.cs</DependentUpon>
     </EmbeddedResource>

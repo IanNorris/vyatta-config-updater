@@ -9,33 +9,92 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Menees;
+using Menees.Diffs;
+using Menees.Windows.Forms;
+using vyatta_config_updater.VyattaConfig;
 
 namespace vyatta_config_updater
 {
 	public partial class Main : Form
 	{
-		private string Address;
-		private string Username;
-		private string Password;
-		private string OldConfigPath;
-		private ASNData ASNData;
-		private List<InterfaceMapping> Interfaces;
+		private RouterData Data;
 
-		public Main( string Address, string Username, string Password, string ConfigPath, ASNData ASNData, List<InterfaceMapping> Interfaces )
+		public Main( RouterData Data )
 		{
-			this.Address = Address;
-			this.Username = Username;
-			this.Password = Password;
-			this.OldConfigPath = ConfigPath;
-			this.ASNData = ASNData;
-			this.Interfaces = Interfaces;
-
+			this.Data = Data;
+			
 			InitializeComponent();
+
+			RoutingList.Items.Clear();
+
+			foreach( var Item in Data.StaticRoutes )
+			{
+				RoutingList.Items.Add( CreateLVIFromStaticRoutingRule(Item) );
+			}
+			RoutingList.Refresh();
+
+			Data.StaticRoutes.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(
+				delegate( object Sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs EventArgs )
+				{
+					if( EventArgs.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add )
+					{
+						foreach( var ItemObj in EventArgs.NewItems )
+						{
+							StaticRoutingData Item = (StaticRoutingData)ItemObj;
+
+							RoutingList.Items.Add( CreateLVIFromStaticRoutingRule(Item) );
+						}
+					}
+					else if( EventArgs.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove )
+					{
+						foreach( var ItemObj in EventArgs.OldItems )
+						{
+							StaticRoutingData Item = (StaticRoutingData)ItemObj;
+
+							foreach( var ListItemObj in RoutingList.Items )
+							{
+								var ListViewItem = ListItemObj as ListViewItem;
+								if( ListViewItem.Tag.Equals(Item) )
+								{
+									RoutingList.Items.Remove( ListViewItem );
+									break;
+								}
+							}
+						}
+					}
+
+					RefreshDiff();
+				}
+			);
 		}
 
-		private void Upload_Click( object sender, EventArgs e )
+		protected override void OnFormClosing(FormClosingEventArgs e)
 		{
-			var GenerateConfig = new RouterGenerateNewConfig( OldConfigPath, ASNData, Interfaces );
+			base.OnFormClosing(e);
+			
+			Application.Exit();
+		}
+
+		private void saveConfigToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+
+		}
+
+		private void RefreshDiff()
+		{
+			Data.NewConfigLines = VyattaConfigUtil.WriteToStringLines( Data.ConfigRoot );
+
+			var Diff = new Menees.Diffs.TextDiff( HashType.HashCode, false, false, 0, false );
+			var EditScript = Diff.Execute( Data.OldConfigLines, Data.NewConfigLines );
+
+			ConfigDiff.SetData( Data.OldConfigLines, Data.NewConfigLines, EditScript, "Existing router config", "New router config", false, true, false );
+			ConfigDiff.GoToFirstDiff();
+		}
+
+		private void makeLiveToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			/*var GenerateConfig = new RouterGenerateNewConfig( OldConfigPath, Data );
 
 			Busy BusyWorker = new Busy( GenerateConfig );
 
@@ -52,7 +111,7 @@ namespace vyatta_config_updater
 
 					if( MessageBox.Show( "Upload new config?", "Are you sure?", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question ) == DialogResult.Yes )
 					{
-						var Busy = new Busy( new RouterWriteNewConfig( Address, Username, Password, GenerateConfig.GetNewConfigPath() ) );
+						var Busy = new Busy( new RouterWriteNewConfig( Data ) );
 						if( Busy.ShowDialog() == DialogResult.OK )
 						{
 							MessageBox.Show( "New config has been uploaded.\nYour router will now reload the config.", "Success!", MessageBoxButtons.OK, MessageBoxIcon.Information );
@@ -63,14 +122,67 @@ namespace vyatta_config_updater
 						}
 					}
 				}
+			}*/
+
+			var Busy = new Busy( new RouterWriteNewConfig( Data ) );
+			if( Busy.ShowDialog() == DialogResult.OK )
+			{
+				MessageBox.Show( "New config has been uploaded.\nYour router will now reload the config.", "Success!", MessageBoxButtons.OK, MessageBoxIcon.Information );
+			}
+			else
+			{
+				MessageBox.Show( "Error uploading new config..", "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error );
 			}
 		}
 
-		protected override void OnFormClosing(FormClosingEventArgs e)
+		private void Main_Load( object sender, EventArgs e )
 		{
-			base.OnFormClosing(e);
-			
-			Application.Exit();
+			RefreshDiff();
+		}
+
+		private ListViewItem CreateLVIFromStaticRoutingRule( StaticRoutingData Route, ListViewItem ExistingItem = null )
+		{
+			ListViewItem Item = ExistingItem != null ? ExistingItem : new ListViewItem();
+			Item.SubItems.Clear();
+			Item.Tag = Route;
+			Item.Text = Route.Name;
+			Item.SubItems.Add( Route.Type.ToString() );
+			Item.SubItems.Add( Route.Destination );
+			Item.SubItems.Add( Route.Interface );
+
+			return Item;
+		}
+
+		private void removeToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			foreach( var ItemObj in RoutingList.SelectedItems )
+			{
+				var Item = ItemObj as ListViewItem;
+				if( Item != null )
+				{
+					var Route = (StaticRoutingData)Item.Tag;
+					Data.StaticRoutes.Remove( Route );
+				}
+			}
+		}
+
+		private void RougingListContextMenu_Opening( object sender, CancelEventArgs e )
+		{
+			RoutingList_ContextMenu_Remove.Enabled = RoutingList.SelectedItems.Count > 0;
+		}
+
+		private void RoutingList_ContextMenu_Add_Click( object sender, EventArgs e )
+		{
+			AddStaticRouteWizard Wizard = new AddStaticRouteWizard();
+			if( Wizard.ShowDialog() == DialogResult.OK )
+			{
+				Data.StaticRoutes.Add( Wizard.GetResult() );
+			}
+		}
+
+		private void enableDNSCryptToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+
 		}
 	}
 }

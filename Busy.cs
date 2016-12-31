@@ -23,6 +23,7 @@ namespace vyatta_config_updater
 			BeginInvoke( new Action(
 				() => 
 				{
+					System.Console.Out.WriteLine( NewStatus );
 					Progress.Value = NewProgress;
 					Status.Text = NewStatus;
 					Progress.Refresh();

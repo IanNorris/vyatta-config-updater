@@ -39,6 +39,12 @@ namespace vyatta_config_updater
 			return GetNetmasksFromASNs( ASNs );
 		}
 
+		public List<string> GetNetmasksFromASN( int ASN )
+		{
+			List<int> ASNs = new List<int>() { ASN };
+			return GetNetmasksFromASNs( ASNs );
+		}
+
 		public List<string> GetNetmasksFromASNs( List<int> ASNs )
 		{
 			List<string> Result = new List<string>();

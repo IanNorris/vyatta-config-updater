@@ -9,66 +9,78 @@ namespace vyatta_config_updater
 {
 	public class RouterGenerateNewConfig : BusyWorkInterface
 	{
-		private string OldConfig;
-		private string NewConfig;
-		private ASNData ASNData;
-		private List<InterfaceMapping> Interfaces;
+		private RouterData Data;
 
-		public RouterGenerateNewConfig( string ConfigPath, ASNData ASNData, List<InterfaceMapping> Interfaces )
+		public RouterGenerateNewConfig( RouterData Data )
 		{
-			this.OldConfig = ConfigPath;
-			this.NewConfig = Path.ChangeExtension(Path.GetTempFileName(), Guid.NewGuid().ToString());
-			this.ASNData = ASNData;
-			this.Interfaces = Interfaces;
-		}
-
-		public string GetNewConfigPath()
-		{
-			return NewConfig;
+			this.Data = Data;
 		}
 
 		public bool DoWork( Util.UpdateStatusDelegate SetStatus, Util.ShouldCancelDelegate ShouldCancel )
 		{
-			SetStatus( "Parsing existing config...", 0 );
-
-			if( ShouldCancel() ) { return false; }
-
-			string Errors = "";
-			VyattaConfigObject Root = VyattaConfigUtil.ReadFromFile( OldConfig, ref Errors );
-
 			if( ShouldCancel() ) { return false; }
 
 			SetStatus( "Deleting previous auto-generated rules...", 16 );
-			VyattaConfigRouting.DeleteGeneratedStaticRoutes( Root );
+			VyattaConfigRouting.DeleteGeneratedStaticRoutes( Data.ConfigRoot );
 
 			if( ShouldCancel() ) { return false; }
 			
 			SetStatus( "Generating Netflix static routing...", 32 );
-			VyattaConfigRouting.AddStaticRoutesForOrganization( Root, "Netflix", ASNData, Interfaces, "Internet" );
+			//VyattaConfigRouting.AddStaticRoutesForOrganization( Data.ConfigRoot, "Netflix", Data, "Internet", "Netflix" );
+			{
+				StaticRoutingData NewRoute = new StaticRoutingData();
+				NewRoute.Destination = "Netflix";
+				NewRoute.Interface = "Internet";
+				NewRoute.Name = "Netflix";
+				NewRoute.Type = RoutingType.Organisation;
+
+				Data.StaticRoutes.Add( NewRoute );
+			}
 
 			if( ShouldCancel() ) { return false; }
 
 			SetStatus( "Generating BBC static routing...", 48 );
-			VyattaConfigRouting.AddStaticRoutesForOrganization( Root, "BBC", ASNData, Interfaces, "Internet" );
+			//VyattaConfigRouting.AddStaticRoutesForOrganization( Data.ConfigRoot, "BBC", Data, "Internet", "BBC" );
+			{
+				StaticRoutingData NewRoute = new StaticRoutingData();
+				NewRoute.Destination = "BBC";
+				NewRoute.Interface = "Internet";
+				NewRoute.Name = "BBC";
+				NewRoute.Type = RoutingType.Organisation;
+
+				Data.StaticRoutes.Add( NewRoute );
+			}
 
 			if( ShouldCancel() ) { return false; }
 
 			SetStatus( "Generating Valve static routing...", 56 );
-			VyattaConfigRouting.AddStaticRoutesForOrganization( Root, "Valve", ASNData, Interfaces, "Internet" );
+			//VyattaConfigRouting.AddStaticRoutesForOrganization( Data.ConfigRoot, "Valve", Data, "Internet", "Valve" );
+			{
+				StaticRoutingData NewRoute = new StaticRoutingData();
+				NewRoute.Destination = "Valve";
+				NewRoute.Interface = "Internet";
+				NewRoute.Name = "Valve";
+				NewRoute.Type = RoutingType.Organisation;
+
+				Data.StaticRoutes.Add( NewRoute );
+			}
 
 			if( ShouldCancel() ) { return false; }
 
 			SetStatus( "Generating Nest static routing...", 80 );
-			VyattaConfigRouting.AddStaticRoutesForOrganization( Root, "Nest", ASNData, Interfaces, "Internet" );
+			//VyattaConfigRouting.AddStaticRoutesForOrganization( Data.ConfigRoot, "Nest", Data, "Internet", "Nest" );
+			{
+				StaticRoutingData NewRoute = new StaticRoutingData();
+				NewRoute.Destination = "Nest";
+				NewRoute.Interface = "Internet";
+				NewRoute.Name = "Nest";
+				NewRoute.Type = RoutingType.Organisation;
+
+				Data.StaticRoutes.Add( NewRoute );
+			}
 			
 			SetStatus( "Saving new config...", 90 );
-			VyattaConfigUtil.WriteToFile( Root, NewConfig );
-
-			if( Errors.Length > 0 )
-			{
-				MessageBox.Show( "Errors when writing config:\n" + Errors, "Error!", MessageBoxButtons.OK, MessageBoxIcon.Error );
-				return false;
-			}
+			Data.NewConfigLines = VyattaConfigUtil.WriteToStringLines( Data.ConfigRoot );
 
 			return true;
 		}

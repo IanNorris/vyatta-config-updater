@@ -8,26 +8,38 @@ namespace vyatta_config_updater.VyattaConfig.Routing
 {
 	public static class VyattaConfigRouting
 	{
-		public static void AddStaticRoutesForOrganization( VyattaConfigObject ConfigRoot, string OrganizationSubstring, ASNData ASNData, List<InterfaceMapping> Interfaces, string Target )
+		public static void AddStaticRoutesForOrganization( VyattaConfigObject ConfigRoot, string OrganizationSubstring, RouterData Data, string Target, string Name )
 		{
-			var Netmasks = ASNData.GetNetmasksFromOrganization( OrganizationSubstring );
+			var Netmasks = Data.ASNData.GetNetmasksFromOrganization( OrganizationSubstring );
 			
-			string Description = string.Format( "VCU-Auto: {0}", OrganizationSubstring );
+			string Description = string.Format( "VCU-Auto: {0}", Name );
 
 			foreach( var Netmask in Netmasks )
 			{
-				VyattaConfigRouting.AddStaticRoute( ConfigRoot, Interfaces, Netmask, Target, Description );
+				VyattaConfigRouting.AddStaticRoute( ConfigRoot, Data, Netmask, Target, Description );
 			}
 		}
 
-		public static VyattaConfigObject AddStaticRoute( VyattaConfigObject ConfigRoot, List<InterfaceMapping> Interfaces, string Network, string Target, string Description )
+		public static void AddStaticRoutesForASN( VyattaConfigObject ConfigRoot, int ASN, RouterData Data, string Target, string Name )
+		{
+			var Netmasks = Data.ASNData.GetNetmasksFromASN( ASN );
+			
+			string Description = string.Format( "VCU-Auto: {0}", Name );
+
+			foreach( var Netmask in Netmasks )
+			{
+				VyattaConfigRouting.AddStaticRoute( ConfigRoot, Data, Netmask, Target, Description );
+			}
+		}
+
+		public static VyattaConfigObject AddStaticRoute( VyattaConfigObject ConfigRoot, RouterData Data, string Network, string Target, string Description )
 		{
 			if( Network.Contains( "-" ) )
 			{
 				Network = VyattaConfigUtil.IPRangeToCIDR( Network );
 			}
 
-			foreach( var Int in Interfaces )
+			foreach( var Int in Data.Interfaces )
 			{
 				if(	   ( Int.Description == Target || Int.Interface == Target )
 					&& Int.Gateway != null )
@@ -66,7 +78,7 @@ namespace vyatta_config_updater.VyattaConfig.Routing
 			return Results;
 		}
 
-		public static void DeleteStaticRoute( VyattaConfigObject ConfigRoot, string Network )
+		public static void DeleteStaticRoute( VyattaConfigObject ConfigRoot, RouterData Data, string Network )
 		{
 			if( Network.Contains( "-" ) )
 			{
@@ -76,7 +88,7 @@ namespace vyatta_config_updater.VyattaConfig.Routing
 			ConfigRoot.Delete( string.Format( "protocols:static:route {0}", Network ) );
 		}
 
-		public static void DeleteGeneratedStaticRoutes( VyattaConfigObject ConfigRoot )
+		public static void DeleteGeneratedStaticRoutes( VyattaConfigObject ConfigRoot, string Name = null )
 		{
 			var StaticRoutesNodes = ConfigRoot.GetChild("protocols:static");
 			var StaticRoutes = StaticRoutesNodes as VyattaConfigObject;
@@ -115,7 +127,12 @@ namespace vyatta_config_updater.VyattaConfig.Routing
 											string Value = CastSubSubAttribute.GetValue(0).GetValue();
 											if( Value != null )
 											{
-												if( Value.Contains( "VCU-Auto:" ) )
+												if( Name != null && Value.Contains( "VCU-Auto: " + Name ) )
+												{
+													IsAuto = true;
+													break;
+												}
+												else if( Value.Contains( "VCU-Auto:" ) )
 												{
 													IsAuto = true;
 													break;
