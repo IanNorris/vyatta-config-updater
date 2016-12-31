@@ -16,14 +16,14 @@ namespace vyatta_config_updater
 
 		public List<int> GetASNByOrganization( string Substring )
 		{
-			Regex Regex = new Regex( string.Format( @".*\b{0}\b.*", Substring.ToLower() ) );
+			string RegexMatch = string.Format( @"\b{0}\b", Substring );
 			
 			List<int> ASNs = new List<int>();
 
 			OwnerToASN.Any( 
 				Pair =>
 			{
-				if( Regex.IsMatch( Pair.Key.ToLower() ) )
+				if( Regex.IsMatch( Pair.Key, RegexMatch, RegexOptions.IgnoreCase ) )
 				{
 					ASNs.AddRange( Pair.Value );
 				}
