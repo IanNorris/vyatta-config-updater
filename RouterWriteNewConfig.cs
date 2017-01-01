@@ -18,44 +18,6 @@ namespace vyatta_config_updater
 			this.Data = Data;
 		}
 
-		private string RunCommand( SshClient Client, string CommandLine )
-		{
-			System.Console.Out.WriteLine( "$ " + CommandLine );
-
-			var Command = Client.RunCommand( CommandLine );
-			string Output = Command.Execute();
-			
-			if( Command.Error.Length > 0 )
-			{
-				System.Console.Error.WriteLine( Command.Error );
-			}
-
-			if( Output.Length > 0 )
-			{
-				System.Console.Out.WriteLine( Output );
-			}
-						
-			if( Command.Error.Length > 0 || Command.ExitStatus != 0 )
-			{
-				throw new Exception( string.Format( "Command failed with the exit code {0}.\nCommand:\n{1}\nError:{2}\n", Command.ExitStatus, CommandLine, Command.Error ) );
-			}
-
-			return Output;
-		}
-
-		private string RunShellCommand( ShellStream Stream, string CommandLine, bool ExpectRootPrompt )
-		{
-			System.Console.Out.WriteLine( "CL$ " + CommandLine );
-
-			Stream.WriteLine( CommandLine );
-
-			string Response = Stream.Expect( ExpectRootPrompt ? new Regex(@"[#>]") : new Regex(@"[$>]") );
-
-			System.Console.Out.WriteLine( Response );
-			
-			return Response;
-		}
-
 		public bool DoWork( Util.UpdateStatusDelegate SetStatus, Util.ShouldCancelDelegate ShouldCancel )
 		{
 			SetStatus( "Connecting to SSH...", 0 );

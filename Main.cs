@@ -182,7 +182,24 @@ namespace vyatta_config_updater
 
 		private void enableDNSCryptToolStripMenuItem_Click( object sender, EventArgs e )
 		{
+			if( MessageBox.Show( 
+				"You are about to enable DNSCrypt that will encrypt your DNS traffic\n" + 
+				"so that it cannot be snooped on by your ISP.\n" + 
+				"This process takes a while and could possibly go wrong\n" + 
+				"leaving your router in an unknown state.\n" +
+				"Are you sure you wish to continue?", 
+				"Confirm enabling DNS crypt?", 
+				MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question ) == DialogResult.Yes )
+			{
+				var Command = new RouterEnableDNSCrypt( Data, this );
 
+				Busy BusyWorker = new Busy( Command );
+
+				if( BusyWorker.ShowDialog() == DialogResult.OK )
+				{
+					MessageBox.Show( "DNSCrypt has been enabled!\nIt is recommended that you now confirm this\nby using DNSLeakTest.com", "Success!", MessageBoxButtons.OK, MessageBoxIcon.Information );
+				}
+			}
 		}
 	}
 }
