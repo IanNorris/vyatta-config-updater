@@ -201,5 +201,18 @@ namespace vyatta_config_updater
 				}
 			}
 		}
+
+		private void logDNSQueriesToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			var Command = new RouterLogDNS( Data );
+
+			Busy BusyWorker = new Busy( Command );
+
+			if( BusyWorker.ShowDialog() == DialogResult.OK )
+			{
+				var ResultForm = new DNSLogViewer( Command.GetLogPath(), Data );
+				ResultForm.ShowDialog();
+			}
+		}
 	}
 }

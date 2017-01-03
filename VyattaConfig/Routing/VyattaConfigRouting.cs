@@ -16,7 +16,7 @@ namespace vyatta_config_updater.VyattaConfig.Routing
 
 			foreach( var Netmask in Netmasks )
 			{
-				VyattaConfigRouting.AddStaticRoute( ConfigRoot, Data, Netmask, Target, Description );
+				VyattaConfigRouting.AddStaticRoute( ConfigRoot, Data, Netmask.NetmaskString, Target, Description );
 			}
 		}
 
@@ -28,7 +28,7 @@ namespace vyatta_config_updater.VyattaConfig.Routing
 
 			foreach( var Netmask in Netmasks )
 			{
-				VyattaConfigRouting.AddStaticRoute( ConfigRoot, Data, Netmask, Target, Description );
+				VyattaConfigRouting.AddStaticRoute( ConfigRoot, Data, Netmask.NetmaskString, Target, Description );
 			}
 		}
 
