@@ -61,6 +61,80 @@ namespace vyatta_config_updater
 
 			return Result;
 		}
+
+		public static bool IPMatchesNetmask( string IP, string Netmask )
+		{
+			var Segments = IP.Split( new char[] { '.' }, 4 );
+
+			var NetmaskSplit = Netmask.Split( new char[] { '/' }, 2 );
+			var NetmaskSegments = NetmaskSplit[0].Split( new char[] { '.' }, 4 );
+
+			UInt32 Mask = 0;
+			if( !UInt32.TryParse( NetmaskSplit[1], out Mask ) )
+			{
+				return false;
+			}
+			
+			UInt32 IPValue = 0;
+			UInt32 NetmaskValue = 0;
+			UInt32 MaskValue = Mask == 32 ? (~(UInt32)0) : (~(((UInt32)1 << (int)(32 - Mask))-1));
+
+			byte TempSegment = 0;
+			for( int seg = 0; seg < 4; seg++ )
+			{
+				if( !byte.TryParse( Segments[seg], out TempSegment ) )
+				{
+					return false;
+				}
+
+				IPValue = IPValue << 8;
+				IPValue |= TempSegment;
+
+				if( !byte.TryParse( NetmaskSegments[seg], out TempSegment ) )
+				{
+					return false;
+				}
+
+				NetmaskValue = NetmaskValue << 8;
+				NetmaskValue |= TempSegment;
+			}
+
+			return (IPValue & MaskValue) == (NetmaskValue & MaskValue);
+		}
+
+		public bool GetMatchingASNAndOrgForIP( string IP, out string ASN, out string Org )
+		{
+			foreach( var Pair in ASNToNetmask )
+			{
+				foreach( var Netmask in Pair.Value )
+				{
+					if( IPMatchesNetmask( IP, Netmask ) )
+					{
+						ASN = Pair.Key.ToString();
+						Org = "Unknown";
+
+						//Now find the org name
+						foreach( var OrgPair in OwnerToASN )
+						{
+							foreach( var OrgASN in OrgPair.Value )
+							{
+								if( OrgASN == Pair.Key )
+								{
+									Org = OrgPair.Key;
+								}
+							}
+						}
+
+						return true;
+					}
+				}
+			}
+
+			ASN = "";
+			Org = "";
+
+			return false;
+		}
 	}
 
 	public class AcquireASNData : BusyWorkInterface

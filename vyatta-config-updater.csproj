@@ -88,6 +88,12 @@
     <Compile Include="DNSCryptResolverPicker.Designer.cs">
       <DependentUpon>DNSCryptResolverPicker.cs</DependentUpon>
     </Compile>
+    <Compile Include="DNSLogViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DNSLogViewer.Designer.cs">
+      <DependentUpon>DNSLogViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="InterfaceMapping.cs" />
     <Compile Include="ListViewColumnSorter.cs" />
     <Compile Include="Login.cs">
@@ -107,6 +113,7 @@
     <Compile Include="RouterData.cs" />
     <Compile Include="RouterEnableDNSCrypt.cs" />
     <Compile Include="RouterGenerateNewConfig.cs" />
+    <Compile Include="RouterLogDNS.cs" />
     <Compile Include="RouterLogin.cs" />
     <Compile Include="RouterWriteNewConfig.cs" />
     <Compile Include="StaticRoutingData.cs" />
@@ -129,6 +136,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DNSCryptResolverPicker.resx">
       <DependentUpon>DNSCryptResolverPicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DNSLogViewer.resx">
+      <DependentUpon>DNSLogViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Login.resx">
       <DependentUpon>Login.cs</DependentUpon>

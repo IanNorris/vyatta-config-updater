@@ -328,6 +328,7 @@ namespace vyatta_config_updater
 			this.logDNSQueriesToolStripMenuItem.Name = "logDNSQueriesToolStripMenuItem";
 			this.logDNSQueriesToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
 			this.logDNSQueriesToolStripMenuItem.Text = "&Log DNS Queries...";
+			this.logDNSQueriesToolStripMenuItem.Click += new System.EventHandler(this.logDNSQueriesToolStripMenuItem_Click);
 			// 
 			// aSNBrowserToolStripMenuItem
 			// 
