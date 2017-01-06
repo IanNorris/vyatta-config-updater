@@ -50,7 +50,9 @@ namespace vyatta_config_updater.VyattaConfig
 
 		public static System.String[] WriteToStringLines( VyattaConfigNode Root )
 		{
-			return WriteToString( Root ).Split( new char[] { '\n' } );
+			string Result = WriteToString( Root );
+			Result = Result.TrimEnd( new char[] { '\n' } );
+			return Result.Split( new char[] { '\n' } );
 		}
 
 		public static void WriteToFile( VyattaConfigNode Root, string TargetFilename )
