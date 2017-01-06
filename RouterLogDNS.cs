@@ -54,8 +54,6 @@ namespace vyatta_config_updater
 
 					SetStatus( "Grabbing dnsmasq config...", 10 );
 
-					//Shell.RunCommand( "sudo /opt/bin/opkg install dnscrypt-proxy", new Regex( "Choose server from list or hit Enter to continue" ), ChooseResolver );
-
 					string DNSMasqConfigPath = Path.ChangeExtension(Path.GetTempFileName(), Guid.NewGuid().ToString());
 					string NewDNSMasqConfigPath = Path.ChangeExtension(Path.GetTempFileName(), Guid.NewGuid().ToString());
 					
@@ -84,7 +82,7 @@ namespace vyatta_config_updater
 					string[] ConfigFileFooter = new string[]
 					{
 						"log-queries",
-						"log-async=25",
+						//"log-async=25", // This just confuses the log and makes it more difficult to parse.
 						"log-facility=/tmp/dnslog.txt",
 						"cache-size=0"
 					};
@@ -134,7 +132,7 @@ namespace vyatta_config_updater
 					SetStatus( "Restarting dnsmasq as normal...", 0 );
 
 					//Restore backup
-					Shell.RunCommand( "sudo cp /etc/dnsmasq.conf /etc/dnsmasq.conf.bak" );
+					Shell.RunCommand( "sudo cp /etc/dnsmasq.conf.bak /etc/dnsmasq.conf" );
 
 					//Restart dnsmasq with the old config again
 					Shell.RunCommand( "sudo /etc/init.d/dnsmasq restart" );
