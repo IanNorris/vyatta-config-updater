@@ -78,7 +78,20 @@ namespace vyatta_config_updater
 				Shell.RunCommand( "compare" );
 
 				SetStatus( "Committing new config (this will take a while)...", 45 );
-				Shell.RunCommand( "commit" );
+				string CommitResult = Shell.RunCommand( "commit" );
+
+				if( CommitResult.Contains( "Commit failed" ) )
+				{
+					//Restore the backup
+					Shell.RunCommand( "cp /config/vcu/previous.boot /config/config.boot");
+
+					Shell.RunCommand( "load" );
+					Shell.RunCommand( "commit" );
+
+					Shell.RunCommand( "exit" );
+
+					throw new Exception( CommitResult );
+				}
 
 				SetStatus( "Committing new config (this will take a while)...", 95 );
 				Shell.RunCommand( "exit" );
