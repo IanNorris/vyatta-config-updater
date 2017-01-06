@@ -122,7 +122,7 @@ namespace vyatta_config_updater
 
 				string ShowRoutes = Shell.RunCommand( "show ip route" );
 
-				Regex ParseGatewayRoutes = new Regex( @"\w\s+\*\>\s+([0-9.]+)\/(\d+)\s+\[\d+\/\d+\] via ([0-9.\/]+), (\w+)" );
+				Regex ParseGatewayRoutes = new Regex( @"\w\s+\*?\>?\s+([0-9.]+)\/(\d+)\s+\[\d+\/\d+\] via ([0-9.\/]+), (\w+)" );
 
 				Dictionary<string, string> Gateways = new Dictionary<string, string>();
 					
