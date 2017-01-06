@@ -12,6 +12,7 @@ namespace vyatta_config_updater
 		ASN,
 		Organisation,
 		Netmask,
+		NetmaskArray,
 	}
 
 	public struct StaticRoutingData

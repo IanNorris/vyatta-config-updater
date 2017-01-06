@@ -50,6 +50,15 @@ namespace vyatta_config_updater
 							{
 								VyattaConfigRouting.AddStaticRoute( ConfigRoot, this, Item.Destination, Item.Interface, Item.Name );
 							}
+							else if( Item.Type == RoutingType.NetmaskArray )
+							{
+								string[] Netmasks = Item.Destination.Split( new char[] { ';'} );
+
+								foreach( string Netmask in Netmasks )
+								{
+									VyattaConfigRouting.AddStaticRoute( ConfigRoot, this, Netmask, Item.Interface, Item.Name );
+								}
+							}
 							else
 							{
 								throw new Exception( "Unimplemented type" );

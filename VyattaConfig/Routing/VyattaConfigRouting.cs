@@ -12,11 +12,9 @@ namespace vyatta_config_updater.VyattaConfig.Routing
 		{
 			var Netmasks = Data.ASNData.GetNetmasksFromOrganization( OrganizationSubstring );
 			
-			string Description = string.Format( "VCU-Auto: {0}", Name );
-
 			foreach( var Netmask in Netmasks )
 			{
-				VyattaConfigRouting.AddStaticRoute( ConfigRoot, Data, Netmask.NetmaskString, Target, Description );
+				VyattaConfigRouting.AddStaticRoute( ConfigRoot, Data, Netmask.NetmaskString, Target, Name );
 			}
 		}
 
@@ -24,11 +22,9 @@ namespace vyatta_config_updater.VyattaConfig.Routing
 		{
 			var Netmasks = Data.ASNData.GetNetmasksFromASN( ASN );
 			
-			string Description = string.Format( "VCU-Auto: {0}", Name );
-
 			foreach( var Netmask in Netmasks )
 			{
-				VyattaConfigRouting.AddStaticRoute( ConfigRoot, Data, Netmask.NetmaskString, Target, Description );
+				VyattaConfigRouting.AddStaticRoute( ConfigRoot, Data, Netmask.NetmaskString, Target, Name );
 			}
 		}
 
@@ -49,9 +45,10 @@ namespace vyatta_config_updater.VyattaConfig.Routing
 				}
 			}
 
+			string DescriptionOut = string.Format( "VCU-Auto: {0}", Description );
 
 			VyattaConfigObject Route = ConfigRoot.AddObject( string.Format( "protocols:static:route {0}:next-hop {1}", Network, Target ) );
-			Route.AddAttribute( "description" ).Add( Description );
+			Route.AddAttribute( "description" ).Add( DescriptionOut );
 			return Route;
 		}
 
