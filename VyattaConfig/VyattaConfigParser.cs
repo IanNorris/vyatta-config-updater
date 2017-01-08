@@ -113,6 +113,13 @@ namespace vyatta_config_updater.VyattaConfig
 
 				var NewAttrib = new VyattaConfigAttribute( InputSplit[0] );
 
+				if( FoundNewLine )
+				{
+					Input = InputSplit[1];
+					Node.AddChild( NewAttrib );
+					continue;
+				}
+
 				if( InputSplit.Length != 2 || InputSplit[1].Length == 0 )
 				{
 					ParseError( ref Errors, Input, "Unexpected end of file." );
