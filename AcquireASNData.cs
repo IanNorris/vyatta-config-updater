@@ -134,16 +134,18 @@ namespace vyatta_config_updater
 			return (IPAsInteger & Netmask.MaskValue) == (Netmask.MaskedAddress & Netmask.MaskValue);
 		}
 
-		public bool GetMatchingASNAndOrgForIP( string IP, out string ASN, out string Org )
+		public bool GetMatchingASNAndOrgForIP( string IP, out string ASN, out string Org, out string Netmask )
 		{
 			UInt32 IPValue = IPAsInteger( IP );
 
 			foreach( var Pair in ASNToNetmask )
 			{
-				foreach( var Netmask in Pair.Value )
+				foreach( var CurrentNetmask in Pair.Value )
 				{
-					if( IPMatchesNetmask( IPValue, Netmask ) )
+					if( IPMatchesNetmask( IPValue, CurrentNetmask ) )
 					{
+						Netmask = CurrentNetmask.NetmaskString;
+
 						ASN = Pair.Key.ToString();
 						if( !ASNToOwner.TryGetValue( Pair.Key, out Org ) )
 						{
@@ -157,6 +159,7 @@ namespace vyatta_config_updater
 
 			ASN = "";
 			Org = "";
+			Netmask = "";
 
 			return false;
 		}

@@ -33,12 +33,12 @@
 			this.Cancel = new System.Windows.Forms.Button();
 			this.OK = new System.Windows.Forms.Button();
 			this.RecordList = new System.Windows.Forms.ListView();
-			this.label1 = new System.Windows.Forms.Label();
 			this.Column_Domain = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.Column_ReverseDNS = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.Column_IP = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.Column_Requester = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.Column_IPOwner = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.Column_ASN_Netmask = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.label1 = new System.Windows.Forms.Label();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.flowLayoutPanel1.SuspendLayout();
 			this.SuspendLayout();
@@ -105,12 +105,13 @@
 			this.RecordList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.RecordList.CheckBoxes = true;
 			this.RecordList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.Column_Domain,
-            this.Column_ReverseDNS,
             this.Column_IP,
             this.Column_Requester,
-            this.Column_IPOwner});
+            this.Column_IPOwner,
+            this.Column_ASN_Netmask});
 			this.RecordList.FullRowSelect = true;
 			this.RecordList.HideSelection = false;
 			this.RecordList.Location = new System.Drawing.Point(9, 9);
@@ -121,27 +122,12 @@
 			this.RecordList.TabIndex = 0;
 			this.RecordList.UseCompatibleStateImageBehavior = false;
 			this.RecordList.View = System.Windows.Forms.View.Details;
-			// 
-			// label1
-			// 
-			this.label1.AutoSize = true;
-			this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.label1.Location = new System.Drawing.Point(9, 535);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(845, 13);
-			this.label1.TabIndex = 2;
-			this.label1.Text = "NOTE: Data may contain data collected from background processes.";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.RecordList.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.RecordList_ColumnClick);
 			// 
 			// Column_Domain
 			// 
 			this.Column_Domain.Text = "Domain";
 			this.Column_Domain.Width = 200;
-			// 
-			// Column_ReverseDNS
-			// 
-			this.Column_ReverseDNS.Text = "Reverse DNS Name";
-			this.Column_ReverseDNS.Width = 200;
 			// 
 			// Column_IP
 			// 
@@ -157,6 +143,22 @@
 			// 
 			this.Column_IPOwner.Text = "IP Owner";
 			this.Column_IPOwner.Width = 200;
+			// 
+			// Column_ASN_Netmask
+			// 
+			this.Column_ASN_Netmask.Text = "ASN Netmask";
+			this.Column_ASN_Netmask.Width = 138;
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.label1.Location = new System.Drawing.Point(9, 535);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(845, 13);
+			this.label1.TabIndex = 2;
+			this.label1.Text = "NOTE: Data may contain data collected from background processes.";
+			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// DNSLogViewer
 			// 
@@ -185,9 +187,9 @@
 		private System.Windows.Forms.ListView RecordList;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.ColumnHeader Column_Domain;
-		private System.Windows.Forms.ColumnHeader Column_ReverseDNS;
 		private System.Windows.Forms.ColumnHeader Column_IP;
 		private System.Windows.Forms.ColumnHeader Column_Requester;
 		private System.Windows.Forms.ColumnHeader Column_IPOwner;
+		private System.Windows.Forms.ColumnHeader Column_ASN_Netmask;
 	}
 }

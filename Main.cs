@@ -202,7 +202,7 @@ namespace vyatta_config_updater
 			}
 		}
 
-		private void logDNSQueriesToolStripMenuItem_Click( object sender, EventArgs e )
+		private void logDNSQueriesToolStripMenuItem_Click_1( object sender, EventArgs e )
 		{
 			var Command = new RouterLogDNS( Data );
 
@@ -211,6 +211,20 @@ namespace vyatta_config_updater
 			if( BusyWorker.ShowDialog() == DialogResult.OK )
 			{
 				var ResultForm = new DNSLogViewer( Command.GetLogPath(), Data );
+				ResultForm.ShowDialog();
+			}
+		}
+
+		private void openDNSLogToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+			OpenFileDialog openFile = new OpenFileDialog();
+			openFile.Filter = "All files (*.*)|*.*";
+			openFile.FilterIndex = 1;
+			openFile.RestoreDirectory = true;
+
+			if( openFile.ShowDialog() == DialogResult.OK )
+			{
+				var ResultForm = new DNSLogViewer( openFile.FileName, Data );
 				ResultForm.ShowDialog();
 			}
 		}

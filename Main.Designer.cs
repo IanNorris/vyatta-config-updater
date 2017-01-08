@@ -61,13 +61,13 @@ namespace vyatta_config_updater
 			this.rollbackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.setupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.addVPNToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.logDNSQueriesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aSNBrowserToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.dNSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.logDNSQueriesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.openDNSLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.enableDNSCryptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.MainLayout.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -220,7 +220,6 @@ namespace vyatta_config_updater
 			// 
 			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.setupToolStripMenuItem,
             this.toolsToolStripMenuItem,
             this.helpToolStripMenuItem});
 			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
@@ -299,36 +298,14 @@ namespace vyatta_config_updater
 			this.exitToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
 			this.exitToolStripMenuItem.Text = "E&xit";
 			// 
-			// setupToolStripMenuItem
-			// 
-			this.setupToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.addVPNToolStripMenuItem,
-            this.enableDNSCryptToolStripMenuItem});
-			this.setupToolStripMenuItem.Name = "setupToolStripMenuItem";
-			this.setupToolStripMenuItem.Size = new System.Drawing.Size(49, 20);
-			this.setupToolStripMenuItem.Text = "&Setup";
-			// 
-			// addVPNToolStripMenuItem
-			// 
-			this.addVPNToolStripMenuItem.Name = "addVPNToolStripMenuItem";
-			this.addVPNToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
-			this.addVPNToolStripMenuItem.Text = "Add &VPN...";
-			// 
 			// toolsToolStripMenuItem
 			// 
 			this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.logDNSQueriesToolStripMenuItem,
-            this.aSNBrowserToolStripMenuItem});
+            this.aSNBrowserToolStripMenuItem,
+            this.dNSToolStripMenuItem});
 			this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
 			this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
 			this.toolsToolStripMenuItem.Text = "&Tools";
-			// 
-			// logDNSQueriesToolStripMenuItem
-			// 
-			this.logDNSQueriesToolStripMenuItem.Name = "logDNSQueriesToolStripMenuItem";
-			this.logDNSQueriesToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
-			this.logDNSQueriesToolStripMenuItem.Text = "&Log DNS Queries...";
-			this.logDNSQueriesToolStripMenuItem.Click += new System.EventHandler(this.logDNSQueriesToolStripMenuItem_Click);
 			// 
 			// aSNBrowserToolStripMenuItem
 			// 
@@ -349,6 +326,30 @@ namespace vyatta_config_updater
 			this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
 			this.aboutToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
 			this.aboutToolStripMenuItem.Text = "&About...";
+			// 
+			// dNSToolStripMenuItem
+			// 
+			this.dNSToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openDNSLogToolStripMenuItem,
+            this.logDNSQueriesToolStripMenuItem,
+            this.enableDNSCryptToolStripMenuItem});
+			this.dNSToolStripMenuItem.Name = "dNSToolStripMenuItem";
+			this.dNSToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.dNSToolStripMenuItem.Text = "DNS";
+			// 
+			// logDNSQueriesToolStripMenuItem
+			// 
+			this.logDNSQueriesToolStripMenuItem.Name = "logDNSQueriesToolStripMenuItem";
+			this.logDNSQueriesToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+			this.logDNSQueriesToolStripMenuItem.Text = "&Log DNS Queries...";
+			this.logDNSQueriesToolStripMenuItem.Click += new System.EventHandler(this.logDNSQueriesToolStripMenuItem_Click_1);
+			// 
+			// openDNSLogToolStripMenuItem
+			// 
+			this.openDNSLogToolStripMenuItem.Name = "openDNSLogToolStripMenuItem";
+			this.openDNSLogToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+			this.openDNSLogToolStripMenuItem.Text = "Open DNS Log...";
+			this.openDNSLogToolStripMenuItem.Click += new System.EventHandler(this.openDNSLogToolStripMenuItem_Click);
 			// 
 			// enableDNSCryptToolStripMenuItem
 			// 
@@ -390,14 +391,12 @@ namespace vyatta_config_updater
 		private ToolStripMenuItem fileToolStripMenuItem;
 		private ToolStripMenuItem loadConfigToolStripMenuItem;
 		private ToolStripMenuItem saveConfigToolStripMenuItem;
-		private ToolStripMenuItem setupToolStripMenuItem;
 		private ToolStripMenuItem helpToolStripMenuItem;
 		private ToolStripMenuItem newToolStripMenuItem;
 		private ToolStripMenuItem saveConfigToolStripMenuItem1;
 		private ToolStripSeparator toolStripSeparator1;
 		private ToolStripMenuItem exitToolStripMenuItem;
 		private ToolStripMenuItem toolsToolStripMenuItem;
-		private ToolStripMenuItem logDNSQueriesToolStripMenuItem;
 		private ToolStripMenuItem makeLiveToolStripMenuItem;
 		private ToolStripMenuItem rollbackToolStripMenuItem;
 		private ToolStripSeparator toolStripSeparator2;
@@ -416,7 +415,9 @@ namespace vyatta_config_updater
 		private ToolStripMenuItem RoutingList_ContextMenu_Add;
 		private ToolStripMenuItem RoutingList_ContextMenu_Remove;
 		private TabPage TabPage_VPNs;
-		private ToolStripMenuItem addVPNToolStripMenuItem;
+		private ToolStripMenuItem dNSToolStripMenuItem;
+		private ToolStripMenuItem openDNSLogToolStripMenuItem;
+		private ToolStripMenuItem logDNSQueriesToolStripMenuItem;
 		private ToolStripMenuItem enableDNSCryptToolStripMenuItem;
 	}
 }
