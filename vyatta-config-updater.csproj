@@ -67,57 +67,57 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AcquireASNData.cs" />
-    <Compile Include="AddStaticRouteWizard.cs">
+    <Compile Include="Jobs\AcquireASNData.cs" />
+    <Compile Include="Dialogs\AddStaticRouteWizard.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AddStaticRouteWizard.Designer.cs">
+    <Compile Include="Dialogs\AddStaticRouteWizard.Designer.cs">
       <DependentUpon>AddStaticRouteWizard.cs</DependentUpon>
     </Compile>
-    <Compile Include="Busy.cs">
+    <Compile Include="Dialogs\Busy.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Busy.Designer.cs">
+    <Compile Include="Dialogs\Busy.Designer.cs">
       <DependentUpon>Busy.cs</DependentUpon>
     </Compile>
-    <Compile Include="BusyWorkInterface.cs" />
-    <Compile Include="ChainWorker.cs" />
-    <Compile Include="DNSCryptResolverPicker.cs">
+    <Compile Include="Utilities\BusyWorkInterface.cs" />
+    <Compile Include="Utilities\ChainWorker.cs" />
+    <Compile Include="Jobs\DNSCrypt\DNSCryptResolverPicker.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DNSCryptResolverPicker.Designer.cs">
+    <Compile Include="Jobs\DNSCrypt\DNSCryptResolverPicker.Designer.cs">
       <DependentUpon>DNSCryptResolverPicker.cs</DependentUpon>
     </Compile>
-    <Compile Include="DNSLogViewer.cs">
+    <Compile Include="Jobs\DNSLogging\DNSLogViewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DNSLogViewer.Designer.cs">
+    <Compile Include="Jobs\DNSLogging\DNSLogViewer.Designer.cs">
       <DependentUpon>DNSLogViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="InterfaceMapping.cs" />
-    <Compile Include="ListViewColumnSorter.cs" />
-    <Compile Include="Login.cs">
+    <Compile Include="Models\InterfaceMapping.cs" />
+    <Compile Include="Utilities\ListViewColumnSorter.cs" />
+    <Compile Include="Jobs\Login\Login.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Login.Designer.cs">
+    <Compile Include="Jobs\Login\Login.Designer.cs">
       <DependentUpon>Login.cs</DependentUpon>
     </Compile>
-    <Compile Include="Main.cs">
+    <Compile Include="Dialogs\Main.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Main.Designer.cs">
+    <Compile Include="Dialogs\Main.Designer.cs">
       <DependentUpon>Main.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RouterData.cs" />
-    <Compile Include="RouterEnableDNSCrypt.cs" />
-    <Compile Include="RouterGenerateNewConfig.cs" />
-    <Compile Include="RouterLogDNS.cs" />
-    <Compile Include="RouterLogin.cs" />
-    <Compile Include="RouterWriteNewConfig.cs" />
-    <Compile Include="StaticRoutingData.cs" />
-    <Compile Include="Util.cs" />
+    <Compile Include="Models\RouterData.cs" />
+    <Compile Include="Jobs\DNSCrypt\RouterEnableDNSCrypt.cs" />
+    <Compile Include="Jobs\RouterGenerateNewConfig.cs" />
+    <Compile Include="Jobs\DNSLogging\RouterLogDNS.cs" />
+    <Compile Include="Jobs\RouterLogin.cs" />
+    <Compile Include="Jobs\RouterWriteNewConfig.cs" />
+    <Compile Include="Models\StaticRoutingData.cs" />
+    <Compile Include="Utilities\Util.cs" />
     <Compile Include="VyattaConfig\Routing\VyattaConfigRouting.cs" />
     <Compile Include="VyattaConfig\VyattaConfigUtil.cs" />
     <Compile Include="VyattaConfig\VyattaConfigAttribute.cs" />
@@ -127,23 +127,23 @@
     <Compile Include="VyattaConfig\VyattaConfigObject.cs" />
     <Compile Include="VyattaConfig\VyattaConfigParser.cs" />
     <Compile Include="VyattaConfig\VyattaConfigValue.cs" />
-    <Compile Include="VyattaShell.cs" />
-    <EmbeddedResource Include="AddStaticRouteWizard.resx">
+    <Compile Include="Utilities\VyattaShell.cs" />
+    <EmbeddedResource Include="Dialogs\AddStaticRouteWizard.resx">
       <DependentUpon>AddStaticRouteWizard.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Busy.resx">
+    <EmbeddedResource Include="Dialogs\Busy.resx">
       <DependentUpon>Busy.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DNSCryptResolverPicker.resx">
+    <EmbeddedResource Include="Jobs\DNSCrypt\DNSCryptResolverPicker.resx">
       <DependentUpon>DNSCryptResolverPicker.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DNSLogViewer.resx">
+    <EmbeddedResource Include="Jobs\DNSLogging\DNSLogViewer.resx">
       <DependentUpon>DNSLogViewer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Login.resx">
+    <EmbeddedResource Include="Jobs\Login\Login.resx">
       <DependentUpon>Login.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Main.resx">
+    <EmbeddedResource Include="Dialogs\Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -169,6 +169,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
