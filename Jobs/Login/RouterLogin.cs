@@ -120,9 +120,9 @@ namespace vyatta_config_updater
 				
 				SetStatus( "Processing routing interfaces...", 8 );
 
-				string ShowRoutes = Shell.RunCommand( "show ip route" );
+				string ShowRoutes = Shell.RunCommand( "sudo route" );
 
-				Regex ParseGatewayRoutes = new Regex( @"\w\s+\*?\>?\s+([0-9.]+)\/(\d+)\s+\[\d+\/\d+\] via ([0-9.\/]+), (\w+)" );
+				Regex ParseGatewayRoutes = new Regex( @"([\w.]+)\W+([\d.]+|\*)\W+([\d.]+)\W+\w+\W+\d+\W+\d+\W+\d+\W+(\w+)" );
 
 				Dictionary<string, string> Gateways = new Dictionary<string, string>();
 					
@@ -133,9 +133,12 @@ namespace vyatta_config_updater
 					if( Match.Success )
 					{
 						//Only match gateways to the internet
-						if( Match.Groups[1].Value == "0.0.0.0" && (Match.Groups[2].Value == "0" || Match.Groups[2].Value == "1") )
+						if( Match.Groups[1].Value == "default" &&  Match.Groups[2].Value != "*" )
 						{
-							Gateways[Match.Groups[4].Value] = Match.Groups[3].Value;
+							if( Match.Groups[3].Value == "0.0.0.0" || Match.Groups[3].Value == "128.0.0.0" )
+							{
+								Gateways[Match.Groups[4].Value] = Match.Groups[2].Value;
+							}
 						}
 					}
 				}
