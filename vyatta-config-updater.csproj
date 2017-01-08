@@ -114,7 +114,7 @@
     <Compile Include="Jobs\DNSCrypt\RouterEnableDNSCrypt.cs" />
     <Compile Include="Jobs\RouterGenerateNewConfig.cs" />
     <Compile Include="Jobs\DNSLogging\RouterLogDNS.cs" />
-    <Compile Include="Jobs\RouterLogin.cs" />
+    <Compile Include="Jobs\Login\RouterLogin.cs" />
     <Compile Include="Jobs\RouterWriteNewConfig.cs" />
     <Compile Include="Models\StaticRoutingData.cs" />
     <Compile Include="Utilities\Util.cs" />
