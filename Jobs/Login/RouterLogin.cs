@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using vyatta_config_updater.VyattaConfig;
+using vyatta_config_updater.Routing;
 
 namespace vyatta_config_updater
 {
@@ -119,30 +120,9 @@ namespace vyatta_config_updater
 				//Enter configure mode
 				
 				SetStatus( "Processing routing interfaces...", 8 );
-
-				string ShowRoutes = Shell.RunCommand( "sudo route" );
-
-				Regex ParseGatewayRoutes = new Regex( @"([\w.]+)\W+([\d.]+|\*)\W+([\d.]+)\W+\w+\W+\d+\W+\d+\W+\d+\W+(\w+)" );
-
-				Dictionary<string, string> Gateways = new Dictionary<string, string>();
-					
-				string[] RouteLines = ShowRoutes.Split( new char[] { '\n' } );
-				foreach( string Line in RouteLines )
-				{
-					Match Match = ParseGatewayRoutes.Match( Line );
-					if( Match.Success )
-					{
-						//Only match gateways to the internet
-						if( Match.Groups[1].Value == "default" &&  Match.Groups[2].Value != "*" )
-						{
-							if( Match.Groups[3].Value == "0.0.0.0" || Match.Groups[3].Value == "128.0.0.0" )
-							{
-								Gateways[Match.Groups[4].Value] = Match.Groups[2].Value;
-							}
-						}
-					}
-				}
-
+				
+				Dictionary<string, string> Gateways = IPRoute.GetDefaultGateways( Shell );
+												
 				SetStatus( "Processing interface list...", 16 );
 				string ShowInterfaces = Shell.RunCommand( "show interfaces" );
 

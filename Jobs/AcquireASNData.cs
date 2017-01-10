@@ -6,20 +6,13 @@ using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
+using vyatta_config_updater.Routing;
 using static vyatta_config_updater.ASNData;
 
 namespace vyatta_config_updater
 {
 	public class ASNData
 	{
-		public struct Netmask
-		{
-			public string NetmaskString;
-			public UInt32 MaskBits;
-			public UInt32 MaskValue;
-			public UInt32 MaskedAddress;
-		}
-
 		public Dictionary<string, List<int>> OwnerToASN = new Dictionary<string, List<int>>();
 		public Dictionary<int, string> ASNToOwner = new Dictionary<int, string>();
 		public Dictionary<int, List<Netmask>> ASNToNetmask = new Dictionary<int, List<Netmask>>();
@@ -72,79 +65,19 @@ namespace vyatta_config_updater
 			return Result;
 		}
 
-		public static Netmask? GetNetmaskFromString( string Netmask )
+		
+
+		public bool GetMatchingASNAndOrgForIP( string IP, out string ASN, out string Org, out string NetmaskString )
 		{
-			Netmask Result = new Netmask();
-
-			var NetmaskSplit = Netmask.Split( new char[] { '/' }, 2 );
-			var NetmaskSegments = NetmaskSplit[0].Split( new char[] { '.' }, 4 );
-
-			UInt32 Mask = 0;
-			if( !UInt32.TryParse( NetmaskSplit[1], out Mask ) )
-			{
-				return null;
-			}
-			
-			UInt32 NetmaskValue = 0;
-			UInt32 MaskValue = Mask == 32 ? (~(UInt32)0) : (~(((UInt32)1 << (int)(32 - Mask))-1));
-
-			byte TempSegment = 0;
-			for( int seg = 0; seg < 4; seg++ )
-			{
-				if( !byte.TryParse( NetmaskSegments[seg], out TempSegment ) )
-				{
-					return null;
-				}
-
-				NetmaskValue = NetmaskValue << 8;
-				NetmaskValue |= TempSegment;
-			}
-			
-			Result.NetmaskString = Netmask;
-			Result.MaskBits = Mask;
-			Result.MaskValue = MaskValue;
-			Result.MaskedAddress = NetmaskValue & MaskValue;
-
-			return Result;
-		}
-
-		public static UInt32 IPAsInteger( string IP )
-		{
-			var Segments = IP.Split( new char[] { '.' }, 4 );
-						
-			UInt32 IPValue = 0;
-			
-			byte TempSegment = 0;
-			for( int seg = 0; seg < 4; seg++ )
-			{
-				if( !byte.TryParse( Segments[seg], out TempSegment ) )
-				{
-					return 0;
-				}
-
-				IPValue = IPValue << 8;
-				IPValue |= TempSegment;
-			}
-
-			return IPValue;
-		}
-
-		public static bool IPMatchesNetmask( UInt32 IPAsInteger, Netmask Netmask )
-		{
-			return (IPAsInteger & Netmask.MaskValue) == (Netmask.MaskedAddress & Netmask.MaskValue);
-		}
-
-		public bool GetMatchingASNAndOrgForIP( string IP, out string ASN, out string Org, out string Netmask )
-		{
-			UInt32 IPValue = IPAsInteger( IP );
+			UInt32 IPValue = Netmask.IPAsInteger( IP );
 
 			foreach( var Pair in ASNToNetmask )
 			{
 				foreach( var CurrentNetmask in Pair.Value )
 				{
-					if( IPMatchesNetmask( IPValue, CurrentNetmask ) )
+					if( Netmask.IPMatchesNetmask( IPValue, CurrentNetmask ) )
 					{
-						Netmask = CurrentNetmask.NetmaskString;
+						NetmaskString = CurrentNetmask.NetmaskString;
 
 						ASN = Pair.Key.ToString();
 						if( !ASNToOwner.TryGetValue( Pair.Key, out Org ) )
@@ -159,7 +92,7 @@ namespace vyatta_config_updater
 
 			ASN = "";
 			Org = "";
-			Netmask = "";
+			NetmaskString = "";
 
 			return false;
 		}
@@ -282,7 +215,7 @@ namespace vyatta_config_updater
 					ASNDataOutput.ASNToNetmask.Add( Convert.ToInt32( Match.Groups[2].Value ), TargetList );
 				}
 
-				Netmask? Value = GetNetmaskFromString( Match.Groups[1].Value );
+				Netmask? Value = Netmask.GetNetmaskFromString( Match.Groups[1].Value );
 				
 				if( Value.HasValue )
 				{

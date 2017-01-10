@@ -80,6 +80,7 @@
     <Compile Include="Dialogs\Busy.Designer.cs">
       <DependentUpon>Busy.cs</DependentUpon>
     </Compile>
+    <Compile Include="Routing\IPRoute.cs" />
     <Compile Include="Utilities\BusyWorkInterface.cs" />
     <Compile Include="Utilities\ChainWorker.cs" />
     <Compile Include="Jobs\DNSCrypt\DNSCryptResolverPicker.cs">
@@ -94,7 +95,7 @@
     <Compile Include="Jobs\DNSLogging\DNSLogViewer.Designer.cs">
       <DependentUpon>DNSLogViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Models\InterfaceMapping.cs" />
+    <Compile Include="Routing\InterfaceMapping.cs" />
     <Compile Include="Utilities\ListViewColumnSorter.cs" />
     <Compile Include="Jobs\Login\Login.cs">
       <SubType>Form</SubType>
@@ -116,7 +117,7 @@
     <Compile Include="Jobs\DNSLogging\RouterLogDNS.cs" />
     <Compile Include="Jobs\Login\RouterLogin.cs" />
     <Compile Include="Jobs\RouterWriteNewConfig.cs" />
-    <Compile Include="Models\StaticRoutingData.cs" />
+    <Compile Include="Routing\StaticRoutingData.cs" />
     <Compile Include="Utilities\Util.cs" />
     <Compile Include="VyattaConfig\Routing\VyattaConfigRouting.cs" />
     <Compile Include="VyattaConfig\VyattaConfigUtil.cs" />

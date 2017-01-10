@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using vyatta_config_updater.Routing;
 
 namespace vyatta_config_updater.VyattaConfig.Routing
 {
@@ -32,7 +33,7 @@ namespace vyatta_config_updater.VyattaConfig.Routing
 		{
 			if( Network.Contains( "-" ) )
 			{
-				Network = VyattaConfigUtil.IPRangeToCIDR( Network );
+				Network = Netmask.IPRangeToCIDR( Network );
 			}
 
 			foreach( var Int in Data.Interfaces )
@@ -79,7 +80,7 @@ namespace vyatta_config_updater.VyattaConfig.Routing
 		{
 			if( Network.Contains( "-" ) )
 			{
-				Network = VyattaConfigUtil.IPRangeToCIDR( Network );
+				Network = Netmask.IPRangeToCIDR( Network );
 			}
 
 			ConfigRoot.Delete( string.Format( "protocols:static:route {0}", Network ) );
