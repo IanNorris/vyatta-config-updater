@@ -182,7 +182,9 @@
 			this.MaximizeBox = false;
 			this.Name = "Login";
 			this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Vyatta Config Builder - Router Login";
+			this.Load += new System.EventHandler(this.Login_Load);
 			this.tableLayoutPanel1.ResumeLayout(false);
 			this.tableLayoutPanel1.PerformLayout();
 			this.flowLayoutPanel1.ResumeLayout(false);

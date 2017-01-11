@@ -7,9 +7,12 @@ namespace vyatta_config_updater
 	{
 		const string RegistryKey = @"SOFTWARE\VyattaConfigUpdater";
 		bool ProgrammaticClosing = false;
+		bool AutoLogin = false;
 
-		public Login()
+		public Login( bool AutoLogin )
 		{
+			this.AutoLogin = AutoLogin;
+
 			InitializeComponent();
 
 			Microsoft.Win32.RegistryKey regSettings = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(RegistryKey);
@@ -85,6 +88,14 @@ namespace vyatta_config_updater
 				MainForm.Show();
 				ProgrammaticClosing = true;
 				Close();
+			}
+		}
+
+		private void Login_Load( object sender, EventArgs e )
+		{
+			if( AutoLogin )
+			{
+				OK_Click( null, null );
 			}
 		}
 	}

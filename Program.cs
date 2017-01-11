@@ -12,12 +12,21 @@ namespace vyatta_config_updater
 		/// The main entry point for the application.
 		/// </summary>
 		[STAThread]
-		static void Main()
+		static void Main( string[] Arguments )
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault( false );
 
-			var BootForm = new Login();
+			bool AutoLogin = false;
+			foreach( var Arg in Arguments )
+			{
+				if( String.Compare( Arg, "-AutoLogin", true ) == 0 )
+				{
+					AutoLogin = true;
+				}
+			}
+
+			var BootForm = new Login( AutoLogin );
 			//var BootForm = new Main( "", "", "", @"X:\ExampleVyattaConfig.txt");
 			BootForm.Show();
 
