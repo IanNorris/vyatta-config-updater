@@ -158,6 +158,8 @@ namespace vyatta_config_updater
 
 			SetStatus( "Starting downloads...", 0 );
 
+			char[] Separators = new char[] { '\t' };
+
 			string NetmaskToASN = AppDataPath + "NetmaskToASN";
 			string ASNToOwner = AppDataPath + "ASNToOwner";
 
@@ -175,8 +177,83 @@ namespace vyatta_config_updater
 
 			SetStatus( "Reading ASN data...", ProgressIntForSection(0) );
 
+			if( File.Exists( NetmaskToASN + ".bin" ) )
+			{
+				using( MemoryStream NetmaskToASNBinMS = new MemoryStream( File.ReadAllBytes( NetmaskToASN + ".bin" ) ) )
+				using( BinaryReader NetmaskToASNBin = new BinaryReader( NetmaskToASNBinMS ) )
+				{
+					while( NetmaskToASNBin.BaseStream.Position != NetmaskToASNBin.BaseStream.Length )
+					{
+						Int32 ASN = NetmaskToASNBin.ReadInt32();
+						uint MaskedAddress = NetmaskToASNBin.ReadUInt32();
+						byte MaskedBits = NetmaskToASNBin.ReadByte();
+						string NetmaskString = NetmaskToASNBin.ReadString();
+
+						Netmask Value = new Netmask();
+						Value.MaskedAddress = MaskedAddress;
+						Value.MaskBits = MaskedBits;
+						Value.MaskValue = MaskedBits == 32 ? ( ~(UInt32)0 ) : ( ~( ( (UInt32)1 << (int)( 32 - MaskedBits ) ) - 1 ) );
+						Value.NetmaskString = NetmaskString;
+
+						List<Netmask> TargetList;
+						if( !ASNDataOutput.ASNToNetmask.TryGetValue( ASN, out TargetList ) )
+						{
+							TargetList = new List<Netmask>();
+							ASNDataOutput.ASNToNetmask.Add( ASN, TargetList );
+						}
+
+						TargetList.Add( Value );
+					}
+				}
+			}
+			else
+			{
+				string[] NetmaskToASNLines = File.ReadAllLines( NetmaskToASN );
+
+				char[] NetmaskSplitSep = new char[] { '/' };
+				char[] IPSep = new char[] { '.' };
+
+				using( FileStream NetmaskToASNBinFS = new FileStream( NetmaskToASN + ".bin", FileMode.CreateNew ) )
+				using( BinaryWriter NetmaskToASNBin = new BinaryWriter( NetmaskToASNBinFS ) )
+				{
+					foreach( var Line in NetmaskToASNLines )
+					{
+						string[] LineSplit = Line.Split( Separators );
+						if( LineSplit.Length != 2 )
+						{
+							throw new Exception( string.Format( "Failed to parse netmask to ASN data file on line {0}", Line ) );
+						}
+
+						Int32 ASN;
+						if( !Int32.TryParse( LineSplit[ 1 ], out ASN ) )
+						{
+							throw new Exception( string.Format( "Failed to parse ASN on line {0}", Line ) );
+						}
+
+						List<Netmask> TargetList;
+						if( !ASNDataOutput.ASNToNetmask.TryGetValue( ASN, out TargetList ) )
+						{
+							TargetList = new List<Netmask>();
+							ASNDataOutput.ASNToNetmask.Add( ASN, TargetList );
+						}
+
+						Netmask? Value = Netmask.GetNetmaskFromString( LineSplit[0] );
+
+						if( Value.HasValue )
+						{
+							TargetList.Add( Value.Value );
+
+							NetmaskToASNBin.Write( ASN );
+							NetmaskToASNBin.Write( Value.Value.MaskedAddress );
+							NetmaskToASNBin.Write( (byte)Value.Value.MaskBits );
+							NetmaskToASNBin.Write( Value.Value.NetmaskString );
+						}
+					}
+				}
+			}
+
 			string[] ASNToOwnerLines = File.ReadAllLines( ASNToOwner );
-			string[] NetmaskToASNLines = File.ReadAllLines( NetmaskToASN );
+					
 
 			Regex ASNToOwnerRegex = new Regex( @"^\s*([0-9]+)\s+(.*)$" );
 			foreach( var Line in ASNToOwnerLines )
@@ -197,30 +274,6 @@ namespace vyatta_config_updater
 				ASNDataOutput.ASNToOwner[ Convert.ToInt32( Match.Groups[1].Value ) ] = Match.Groups[2].Value;
 
 				TargetList.Add( Convert.ToInt32( Match.Groups[1].Value ) );
-			}
-
-			Regex NetmaskToASNRegex = new Regex( @"^([0-9.]+/\d+)\s+(\d+)$" );
-			foreach( var Line in NetmaskToASNLines )
-			{
-				Match Match = NetmaskToASNRegex.Match( Line );
-				if( !Match.Success )
-				{
-					throw new Exception( string.Format( "Failed to parse netmask to ASN data file on line {0}", Line ) );
-				}
-
-				List<Netmask> TargetList;
-				if( !ASNDataOutput.ASNToNetmask.TryGetValue( Convert.ToInt32( Match.Groups[2].Value ), out TargetList ) )
-				{
-					TargetList = new List<Netmask>();
-					ASNDataOutput.ASNToNetmask.Add( Convert.ToInt32( Match.Groups[2].Value ), TargetList );
-				}
-
-				Netmask? Value = Netmask.GetNetmaskFromString( Match.Groups[1].Value );
-				
-				if( Value.HasValue )
-				{
-					TargetList.Add( Value.Value );
-				}
 			}
 
 			SetStatus( "Processing ASN data...", ProgressIntForSection(20) );
