@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using vyatta_config_updater.Dialogs;
 
 namespace vyatta_config_updater
 {
@@ -27,6 +28,7 @@ namespace vyatta_config_updater
 			}
 
 			var BootForm = new Login( AutoLogin );
+			//var BootForm = new AddStaticRouteWizard();
 			//var BootForm = new Main( "", "", "", @"X:\ExampleVyattaConfig.txt");
 			BootForm.Show();
 

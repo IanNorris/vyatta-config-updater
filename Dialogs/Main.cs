@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using Menees;
 using Menees.Diffs;
 using Menees.Windows.Forms;
+using vyatta_config_updater.Dialogs;
 using vyatta_config_updater.VyattaConfig;
 
 namespace vyatta_config_updater
@@ -173,10 +174,10 @@ namespace vyatta_config_updater
 
 		private void RoutingList_ContextMenu_Add_Click( object sender, EventArgs e )
 		{
-			AddStaticRouteWizard Wizard = new AddStaticRouteWizard();
-			if( Wizard.ShowDialog() == DialogResult.OK )
+			AddStaticRouteWizard Wizard = new AddStaticRouteWizard( Data );
+			if( Wizard.ShowDialog().GetValueOrDefault() )
 			{
-				Data.StaticRoutes.Add( Wizard.GetResult() );
+				//Data.StaticRoutes.Add( Wizard.GetResult() );
 			}
 		}
 

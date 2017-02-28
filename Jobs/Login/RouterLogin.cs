@@ -6,6 +6,7 @@ using Renci.SshNet;
 using Renci.SshNet.Common;
 using vyatta_config_updater.VyattaConfig;
 using vyatta_config_updater.Routing;
+using System.Collections.ObjectModel;
 
 namespace vyatta_config_updater
 {
@@ -126,9 +127,9 @@ namespace vyatta_config_updater
 				SetStatus( "Processing interface list...", 16 );
 				string ShowInterfaces = Shell.RunCommand( "show interfaces" );
 
-				Regex ParseInterfaces = new Regex( @"(\w+)\s+([0-9.\-]+(:?\/[0-9]+)?)\s+(\w\/\w)\s+(\w+)?" );
+				Regex ParseInterfaces = new Regex( @"([\w\.]+)\s+([0-9.\-]+(:?\/[0-9]+)?)\s+(\w\/\w)\s+(\w+)?" );
 
-				Data.Interfaces = new List<InterfaceMapping>();
+				Data.Interfaces = new ObservableCollection<InterfaceMapping>();
 
 				string[] InterfaceLines = ShowInterfaces.Split( new char[] { '\n' } );
 				foreach( string Line in InterfaceLines )

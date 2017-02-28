@@ -192,8 +192,9 @@ namespace vyatta_config_updater
 						Netmask Value = new Netmask();
 						Value.MaskedAddress = MaskedAddress;
 						Value.MaskBits = MaskedBits;
-						Value.MaskValue = MaskedBits == 32 ? ( ~(UInt32)0 ) : ( ~( ( (UInt32)1 << (int)( 32 - MaskedBits ) ) - 1 ) );
+						Value.MaskValue = MaskedBits == 0 ? 0 : ( ~( ( (UInt32)1 << (int)( 32 - MaskedBits ) ) - 1 ) );
 						Value.NetmaskString = NetmaskString;
+						Value.ASN = (UInt32)ASN;
 
 						List<Netmask> TargetList;
 						if( !ASNDataOutput.ASNToNetmask.TryGetValue( ASN, out TargetList ) )

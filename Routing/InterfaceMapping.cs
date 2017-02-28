@@ -13,5 +13,31 @@ namespace vyatta_config_updater
 		public string Codes;
 		public string Description;
 		public string Gateway;
+
+		public override string ToString()
+		{
+			if( Description.Length > 0 )
+			{
+				if( IPAddress.Length > 0 )
+				{
+					return $"{Description} ({Interface} - {IPAddress})";
+				}
+				else
+				{
+					return $"{Description} ({Interface})";
+				}
+			}
+			else
+			{
+				if( IPAddress.Length > 0 )
+				{
+					return $"{Interface} - {IPAddress}";
+				}
+				else
+				{
+					return $"{Interface}";
+				}
+			}
+		}
 	}
 }

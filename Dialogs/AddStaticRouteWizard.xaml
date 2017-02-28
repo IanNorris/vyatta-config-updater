@@ -1,0 +1,111 @@
+﻿<Window x:Class="vyatta_config_updater.Dialogs.AddStaticRouteWizard"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:aw="clr-namespace:AvalonWizard;assembly=AvalonWizard"
+        xmlns:vcuu="clr-namespace:vyatta_config_updater.Utilities"
+        xmlns:local="clr-namespace:vyatta_config_updater.Dialogs"
+        mc:Ignorable="d"
+        Title="Add new static route" Height="500" Width="650">
+    <Window.Resources>
+        <vcuu:InvertBool x:Key="InvertBool"/>
+        <vcuu:EnumToBoolConverter x:Key="EnumToBool"/>
+        <local:EnableListBoxConverter x:Key="EnableListBox"/>
+        <local:EnableInterfaceComboConverter x:Key="EnableInterfaceCombo"/>
+    </Window.Resources>
+    <Grid>
+        <aw:Wizard x:Name="Wizard" aw:Designer.PageIndex="1">
+            <aw:WizardPage Header="Traffic destination" aw:Wizard97.Subtitle="Choose the type of destination you would like to target">
+                <Grid Margin="40,0,10,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Margin="0,0,0,6">Select the type of traffic destination:</TextBlock>
+                    <RadioButton Name="LoggedDomains" Grid.Row="1" GroupName="DestinationType" Margin="12,0,0,6" IsChecked="{Binding Path=RouteType, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static local:StaticRouteType.DNSLog}}">IP addresses from a collection period</RadioButton>
+                    <RadioButton Name="WholeInternet" Grid.Row="2" GroupName="DestinationType" Margin="12,0,0,6" IsChecked="{Binding Path=RouteType, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static local:StaticRouteType.All}}">The whole internet</RadioButton>
+                    <RadioButton Name="Organization" Grid.Row="3" GroupName="DestinationType" Margin="12,0,0,6" IsChecked="{Binding Path=RouteType, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static local:StaticRouteType.Organization}}">Organization (e.g. BBC, Netflix)</RadioButton>
+                    <RadioButton Name="ASN" Grid.Row="4" GroupName="DestinationType" Margin="12,0,0,6" IsChecked="{Binding Path=RouteType, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static local:StaticRouteType.ASN}}">ASN (e.g. 11 [Harvard University])</RadioButton>
+                    <RadioButton Name="Netmask" Grid.Row="5" GroupName="DestinationType" Margin="12,0,0,6" IsChecked="{Binding Path=RouteType, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static local:StaticRouteType.NetmaskArray}}">Netmask (e.g. 192.168.0.0/16)</RadioButton>
+                    <RadioButton Name="IP" Grid.Row="6" GroupName="DestinationType" Margin="12,0,0,6" IsChecked="{Binding Path=RouteType, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static local:StaticRouteType.IP}}">IP (e.g. 192.168.103.2)</RadioButton>
+                    <TextBlock Grid.Row="7" Margin="0,30,0,6" IsEnabled="{Binding Path=RouteType, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static local:StaticRouteType.IP}}">Enter the destination targets (comma separated):</TextBlock>
+                    <TextBox Grid.Row="8" Margin="12,0,0,0" IsEnabled="{Binding Path=RouteType, Converter={StaticResource EnableListBox}}" Name="AddressFilter" Text="{Binding Path=FilterValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <ListBox Grid.Row="9" Margin="12,0,0,6" IsEnabled="{Binding Path=RouteType, Converter={StaticResource EnableListBox}}" Name="AddressList"/>
+
+                    <TextBlock Grid.Row="10" Margin="12,0,0,36" FontStyle="Italic" Text="{Binding Path=SummaryTotal}" Name="Summary"/>
+                </Grid>
+            </aw:WizardPage>
+
+            <aw:WizardPage Header="Traffic routing" aw:Wizard97.Subtitle="Choose the action to take on matching traffic">
+                <Grid Margin="40,0,10,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Margin="0,0,0,6">Select the traffic action:</TextBlock>
+                    <RadioButton Name="Action_Drop" Grid.Row="1" GroupName="DestinationType" Margin="12,0,0,6" IsChecked="{Binding Path=RouteAction, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static local:StaticRouteAction.Drop}}">Drop this traffic</RadioButton>
+                    <RadioButton Name="Action_Interface" Grid.Row="2" GroupName="DestinationType" Margin="12,0,0,6" IsChecked="{Binding Path=RouteAction, Converter={StaticResource EnumToBool}, ConverterParameter={x:Static local:StaticRouteAction.ToInterface}}">Send to this interface:</RadioButton>
+                    <ComboBox Name="Interface" Grid.Row="3" Margin="24,0,0,6" IsEnabled="{Binding Path=RouteAction, Converter={StaticResource EnableInterfaceCombo}}" SelectedIndex="0"></ComboBox>
+                </Grid>
+            </aw:WizardPage>
+
+            <aw:WizardPage Header="Finish creating route" aw:Wizard97.Subtitle="Choose a name for the route and review stats">
+                <Grid Margin="40,0,10,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Margin="0,0,0,6">Enter a name:</TextBlock>
+                    <TextBox Name="RouteName" Grid.Row="1" Margin="12,0,0,36"></TextBox>
+                    <TextBlock Grid.Row="2" Margin="0,0,0,6">Route details:</TextBlock>
+
+                    <Grid Margin="12,0,0,0" Grid.Row="3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" Margin="0,0,12,6">Type:</TextBlock>
+                        <TextBlock Grid.Row="0" Grid.Column="1" >Organization</TextBlock>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" Margin="0,0,12,6">Destination:</TextBlock>
+                        <TextBlock Grid.Row="1" Grid.Column="1" >Netflix</TextBlock>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" Margin="0,0,12,6">Rules created:</TextBlock>
+                        <TextBlock Grid.Row="2" Grid.Column="1" >31</TextBlock>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" HorizontalAlignment="Right" Margin="0,0,12,6">IP Addresses matched:</TextBlock>
+                        <TextBlock Grid.Row="3" Grid.Column="1" >3221</TextBlock>
+
+                        <TextBlock Grid.Row="4" Grid.Column="0" HorizontalAlignment="Right" Margin="0,0,12,6">Performance impact:</TextBlock>
+                        <TextBlock Grid.Row="4" Grid.Column="1" Foreground="Red" >Extremely High</TextBlock>
+                    </Grid>
+
+                    <TextBlock Margin="12,36,0,0" Grid.Row="6" TextWrapping="Wrap" FontStyle="Italic">Please be aware that creating a large number of routes will negatively impact performance and router boot time.</TextBlock>
+                </Grid>
+            </aw:WizardPage>
+        </aw:Wizard>
+    </Grid>
+</Window>

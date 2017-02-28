@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -13,6 +14,23 @@ namespace vyatta_config_updater.Routing
 		public UInt32 MaskBits;
 		public UInt32 MaskValue;
 		public UInt32 MaskedAddress;
+		public UInt32 ASN; //Only gets set by ASNData
+
+		public UInt32 IPCount
+		{
+			get
+			{
+				UInt32 RangeMax = ~0U - 1;
+
+				UInt32 MinValue = MaskedAddress & MaskValue;
+				UInt32 MaxValue = (MaskedAddress & MaskValue) | ~MaskValue;
+
+				MinValue &= RangeMax;
+				MaxValue &= RangeMax;
+
+				return Math.Max(MaxValue-MinValue,1);
+			}
+		}
 
 		public static UInt32 NetmaskValueFromGenmask( string Genmask )
 		{
@@ -106,12 +124,42 @@ namespace vyatta_config_updater.Routing
 			return Result;
 		}
 
+		public static bool IsValidIP( string IP )
+		{
+			var Segments = IP.Split( new char[] { '.' }, 4 );
+			if( Segments.Length != 4 )
+			{
+				return false;
+			}
+			
+			byte TempSegment = 0;
+			for( int seg = 0; seg < 4; seg++ )
+			{
+				if( !byte.TryParse( Segments[seg], out TempSegment ) )
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
 		public static Netmask? GetNetmaskFromString( string Netmask )
 		{
 			Netmask Result = new Netmask();
 
 			var NetmaskSplit = Netmask.Split( new char[] { '/' }, 2 );
+
+			if( NetmaskSplit.Length != 2 )
+			{
+				return null;
+			}
+
 			var NetmaskSegments = NetmaskSplit[0].Split( new char[] { '.' }, 4 );
+			if( NetmaskSegments.Length != 4 )
+			{
+				return null;
+			}
 
 			UInt32 Mask = 0;
 			if( !UInt32.TryParse( NetmaskSplit[1], out Mask ) )
@@ -120,7 +168,7 @@ namespace vyatta_config_updater.Routing
 			}
 			
 			UInt32 NetmaskValue = 0;
-			UInt32 MaskValue = Mask == 32 ? (~(UInt32)0) : (~(((UInt32)1 << (int)(32 - Mask))-1));
+			UInt32 MaskValue = Mask == 0 ? 0 : (~(((UInt32)1 << (int)(32 - Mask))-1));
 
 			byte TempSegment = 0;
 			for( int seg = 0; seg < 4; seg++ )
@@ -145,6 +193,10 @@ namespace vyatta_config_updater.Routing
 		public static UInt32 IPAsInteger( string IP )
 		{
 			var Segments = IP.Split( new char[] { '.' }, 4 );
+			if( Segments.Length != 4)
+			{
+				return 0;
+			}
 						
 			UInt32 IPValue = 0;
 			

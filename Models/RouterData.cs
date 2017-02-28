@@ -17,7 +17,7 @@ namespace vyatta_config_updater
 
 		public ObservableCollection<StaticRoutingData> StaticRoutes = new ObservableCollection<StaticRoutingData>();
 		public ASNData ASNData = new ASNData();
-		public List<InterfaceMapping> Interfaces = new List<InterfaceMapping>();
+		public ObservableCollection <InterfaceMapping> Interfaces = new ObservableCollection <InterfaceMapping>();
 		public VyattaConfigObject ConfigRoot;
 		public VyattaConfigObject TemplateRoot;
 
