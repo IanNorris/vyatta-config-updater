@@ -147,6 +147,7 @@ namespace vyatta_config_updater
 			Item.SubItems.Clear();
 			Item.Tag = Route;
 			Item.Text = Route.Name;
+			Item.SubItems.Add( Route.Action.ToString() );
 			Item.SubItems.Add( Route.Type.ToString() );
 			Item.SubItems.Add( Route.Destination );
 			Item.SubItems.Add( Route.Interface );
@@ -177,7 +178,31 @@ namespace vyatta_config_updater
 			AddStaticRouteWizard Wizard = new AddStaticRouteWizard( Data );
 			if( Wizard.ShowDialog().GetValueOrDefault() )
 			{
-				//Data.StaticRoutes.Add( Wizard.GetResult() );
+				var Result = (AddStaticRouteWizardData)Wizard.DataContext;
+
+				StaticRoutingData NewRoute = new StaticRoutingData();
+				NewRoute.Name = Result.RouteNameValue;
+
+				switch( Result.RouteType )
+				{
+					case StaticRouteType.All:
+					case StaticRouteType.DNSLog:
+					case StaticRouteType.IP:
+					case StaticRouteType.Netmask:
+						NewRoute.Type = RoutingType.Netmask;
+						break;
+					case StaticRouteType.Organization:
+						NewRoute.Type = RoutingType.Organisation;
+						break;
+					case StaticRouteType.ASN:
+						NewRoute.Type = RoutingType.ASN;
+						break;
+				}
+				NewRoute.Destination = Result.FilterValue;
+				NewRoute.Interface = Result.RouterData.Interfaces[Result.SelectedInterface].Interface;
+				NewRoute.Action = Result.RouteAction;
+
+				Data.StaticRoutes.Add( NewRoute );
 			}
 		}
 

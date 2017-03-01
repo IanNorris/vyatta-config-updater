@@ -12,7 +12,12 @@ namespace vyatta_config_updater
 		ASN,
 		Organisation,
 		Netmask,
-		NetmaskArray,
+	}
+
+	public enum StaticRouteAction
+	{
+		Drop,
+		ToInterface
 	}
 
 	public struct StaticRoutingData
@@ -21,5 +26,6 @@ namespace vyatta_config_updater
 		public RoutingType Type;
 		public string Destination;
 		public string Interface;
+		public StaticRouteAction Action;
 	}
 }

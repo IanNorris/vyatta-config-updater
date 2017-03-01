@@ -304,7 +304,7 @@ namespace vyatta_config_updater.Routing
 			foreach( Route Route in Routes )
 			{
 				//Only match gateways to the internet
-				if( Route.Destination == "default" &&  Route.Gateway != "0.0.0.0" )
+				if( (Route.Destination == "default" || Route.Destination == "0.0.0.0") &&  Route.Gateway != "0.0.0.0" )
 				{
 					if( Route.Genmask == "0.0.0.0" || Route.Genmask == "128.0.0.0" )
 					{

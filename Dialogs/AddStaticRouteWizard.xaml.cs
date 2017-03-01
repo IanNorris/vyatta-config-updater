@@ -5,6 +5,7 @@ using System.Windows.Data;
 using vyatta_config_updater.Routing;
 using System;
 using System.Windows.Controls;
+using System.ComponentModel;
 
 namespace vyatta_config_updater.Dialogs
 {
@@ -14,23 +15,106 @@ namespace vyatta_config_updater.Dialogs
 		DNSLog,
 		Organization,
 		ASN,
-		NetmaskArray,
+		Netmask,
 		IP
 	}
 
-	public enum StaticRouteAction
+	public enum RouteCost
 	{
-		Drop,
-		ToInterface
+		Low,
+		Medium,
+		High,
+		VeryHigh,
+		Extreme
 	}
 
 	public class AddStaticRouteWizardData
 	{
+		private const int RouteMediumCostThreshold = 3;
+		private const int RouteHighCostThreshold = 6;
+		private const int RouteVeryHighCostThreshold = 10;
+		private const int RouteExtremeCostThreshold = 15;
+
+		public RouteCost EstimatedRouteCost
+		{
+			get
+			{
+				if( TotalRules < RouteMediumCostThreshold )
+				{
+					return RouteCost.Low;
+				}
+				else if( TotalRules < RouteHighCostThreshold )
+				{
+					return RouteCost.Medium;
+				}
+				else if( TotalRules < RouteVeryHighCostThreshold )
+				{
+					return RouteCost.High;
+				}
+				else if( TotalRules < RouteExtremeCostThreshold )
+				{
+					return RouteCost.VeryHigh;
+				}
+				else
+				{
+					return RouteCost.Extreme;
+				}
+			}
+		}
+
+		public string EstimatedRouteCostString
+		{
+			get
+			{
+				switch( EstimatedRouteCost )
+				{
+					case RouteCost.Low: return "Low";
+					case RouteCost.Medium: return "Medium";
+					case RouteCost.High: return "High";
+					case RouteCost.VeryHigh: return "Very High";
+					case RouteCost.Extreme: return "Extremely High";
+					default:
+						return "Unknown";
+				}
+			}
+		}
+
+		public string EstimatedRouteColor
+		{
+			get
+			{
+				switch( EstimatedRouteCost )
+				{
+					case RouteCost.Low: return "Black";
+					case RouteCost.Medium: return "Orange";
+					case RouteCost.High: return "Orange";
+					case RouteCost.VeryHigh: return "Red";
+					case RouteCost.Extreme: return "Red";
+					default:
+						return "Unknown";
+				}
+			}
+		}
+
+
 		public delegate void UpdatedListType();
 		public UpdatedListType UpdatedList;
 
+		public delegate void UpdatedSummaryType();
+		public UpdatedSummaryType UpdatedSummary;
+
 		UInt32 TotalIPs;
 		int TotalRules;
+
+		public UInt32 TotalIPCountProperty {get { return TotalIPs; }}
+		public int TotalRuleCountProperty {get { return TotalRules; }}
+
+		int _SelectedInterface = 0;
+		public int SelectedInterface
+		{
+			get { return _SelectedInterface; }
+			set { _SelectedInterface = value; }
+		}
 
 		string _FilterValue = "";
 		public string FilterValue
@@ -38,11 +122,52 @@ namespace vyatta_config_updater.Dialogs
 			get { return _FilterValue; }
 			set { _FilterValue = value; UpdateAddressList(); }
 		}
+
+		public bool CanContinue_FilterPage { get { return TotalRuleCountProperty > 0 && TotalRuleCountProperty <= RouteExtremeCostThreshold; } }
+		public bool CanContinue_SummaryPage { get { return _RouteNameValue.Length > 0; } }
+		public string ColorStatusMessage { get {  return CanContinue_FilterPage ? "Black" : "Red"; } }
+
+		string _RouteNameValue = "";
+		public string RouteNameValue
+		{
+			get { return _RouteNameValue; }
+			set { _RouteNameValue = value; UpdatedSummary(); }
+		}
+
 		StaticRouteType _RouteType = StaticRouteType.DNSLog;
 		public StaticRouteType RouteType
 		{
 			get { return _RouteType; }
 			set { _RouteType = value; UpdateAddressList(); }
+		}
+
+		public string FilterValuePresentable
+		{
+			get { return _RouteType == StaticRouteType.All ? "The Whole Internet" : _FilterValue; }
+		}
+
+		public string RouteTypeName
+		{
+			get
+			{
+				switch( _RouteType )
+				{
+					case StaticRouteType.All:
+						return "The Whole Internet";
+					case StaticRouteType.DNSLog:
+						return "Collected IPs";
+					case StaticRouteType.Organization:
+						return "Organization";
+					case StaticRouteType.ASN:
+						return "ASN";
+					case StaticRouteType.Netmask:
+						return "Specified Netmasks";
+					case StaticRouteType.IP:
+						return "Specific IP Addresses";
+					default:
+						return "Unknown";
+				}
+			}
 		}
 
 		StaticRouteAction _RouteAction = StaticRouteAction.ToInterface;
@@ -78,7 +203,7 @@ namespace vyatta_config_updater.Dialogs
 			if( RouteType == StaticRouteType.All )
 			{
 				ActualValue = "0.0.0.0/1,1.0.0.0/1";
-				ActualRouteType = StaticRouteType.NetmaskArray;
+				ActualRouteType = StaticRouteType.Netmask;
 			}
 			
 			var Split = ActualValue.Split( new char[] { ',', ';' } );
@@ -152,7 +277,7 @@ namespace vyatta_config_updater.Dialogs
 						}
 						break;
 
-					case StaticRouteType.NetmaskArray:
+					case StaticRouteType.Netmask:
 						{
 							Netmask? NetmaskValue = vyatta_config_updater.Routing.Netmask.GetNetmaskFromString( Value );
 							if( NetmaskValue.HasValue )
@@ -199,6 +324,7 @@ namespace vyatta_config_updater.Dialogs
 			var DC = new AddStaticRouteWizardData( Data );
 			DataContext = DC;
 			DC.UpdatedList += Addresses_CollectionChanged;
+			DC.UpdatedSummary += Summary_Changed;
 
 			AddressList.ItemsSource = DC.Addresses;
 			Interface.ItemsSource = DC.RouterData.Interfaces;
@@ -207,6 +333,20 @@ namespace vyatta_config_updater.Dialogs
 		private void Addresses_CollectionChanged()
 		{
 			Summary.GetBindingExpression(TextBlock.TextProperty).UpdateTarget();
+			Summary.GetBindingExpression(TextBlock.ForegroundProperty).UpdateTarget();
+
+			FilterPage.GetBindingExpression( AvalonWizard.WizardPage.AllowNextProperty ).UpdateTarget();
+		}
+
+		private void Summary_Changed()
+		{
+			SummaryPage.GetBindingExpression( AvalonWizard.WizardPage.AllowFinishProperty ).UpdateTarget();
+		}
+
+		private void Wizard_Finished( object sender, RoutedEventArgs e )
+		{
+			DialogResult = true;
+			Close();
 		}
 	}
 

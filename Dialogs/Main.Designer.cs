@@ -63,12 +63,13 @@ namespace vyatta_config_updater
 			this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aSNBrowserToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.dNSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.openDNSLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.logDNSQueriesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.enableDNSCryptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.dNSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.logDNSQueriesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.openDNSLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.enableDNSCryptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.Routing_Column_Action = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.MainLayout.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
@@ -138,6 +139,7 @@ namespace vyatta_config_updater
 			this.RoutingList.AllowColumnReorder = true;
 			this.RoutingList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.Routing_Column_Name,
+            this.Routing_Column_Action,
             this.Routing_Column_Type,
             this.Routing_Column_Destination,
             this.Routing_Column_Interface});
@@ -310,8 +312,39 @@ namespace vyatta_config_updater
 			// aSNBrowserToolStripMenuItem
 			// 
 			this.aSNBrowserToolStripMenuItem.Name = "aSNBrowserToolStripMenuItem";
-			this.aSNBrowserToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
+			this.aSNBrowserToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
 			this.aSNBrowserToolStripMenuItem.Text = "&ASN Browser...";
+			// 
+			// dNSToolStripMenuItem
+			// 
+			this.dNSToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openDNSLogToolStripMenuItem,
+            this.logDNSQueriesToolStripMenuItem,
+            this.enableDNSCryptToolStripMenuItem});
+			this.dNSToolStripMenuItem.Name = "dNSToolStripMenuItem";
+			this.dNSToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+			this.dNSToolStripMenuItem.Text = "DNS";
+			// 
+			// openDNSLogToolStripMenuItem
+			// 
+			this.openDNSLogToolStripMenuItem.Name = "openDNSLogToolStripMenuItem";
+			this.openDNSLogToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
+			this.openDNSLogToolStripMenuItem.Text = "Open DNS Log...";
+			this.openDNSLogToolStripMenuItem.Click += new System.EventHandler(this.openDNSLogToolStripMenuItem_Click);
+			// 
+			// logDNSQueriesToolStripMenuItem
+			// 
+			this.logDNSQueriesToolStripMenuItem.Name = "logDNSQueriesToolStripMenuItem";
+			this.logDNSQueriesToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
+			this.logDNSQueriesToolStripMenuItem.Text = "&Log DNS Queries...";
+			this.logDNSQueriesToolStripMenuItem.Click += new System.EventHandler(this.logDNSQueriesToolStripMenuItem_Click_1);
+			// 
+			// enableDNSCryptToolStripMenuItem
+			// 
+			this.enableDNSCryptToolStripMenuItem.Name = "enableDNSCryptToolStripMenuItem";
+			this.enableDNSCryptToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
+			this.enableDNSCryptToolStripMenuItem.Text = "Enable DNSCrypt...";
+			this.enableDNSCryptToolStripMenuItem.Click += new System.EventHandler(this.enableDNSCryptToolStripMenuItem_Click);
 			// 
 			// helpToolStripMenuItem
 			// 
@@ -327,36 +360,9 @@ namespace vyatta_config_updater
 			this.aboutToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
 			this.aboutToolStripMenuItem.Text = "&About...";
 			// 
-			// dNSToolStripMenuItem
+			// Routing_Column_Action
 			// 
-			this.dNSToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.openDNSLogToolStripMenuItem,
-            this.logDNSQueriesToolStripMenuItem,
-            this.enableDNSCryptToolStripMenuItem});
-			this.dNSToolStripMenuItem.Name = "dNSToolStripMenuItem";
-			this.dNSToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-			this.dNSToolStripMenuItem.Text = "DNS";
-			// 
-			// logDNSQueriesToolStripMenuItem
-			// 
-			this.logDNSQueriesToolStripMenuItem.Name = "logDNSQueriesToolStripMenuItem";
-			this.logDNSQueriesToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
-			this.logDNSQueriesToolStripMenuItem.Text = "&Log DNS Queries...";
-			this.logDNSQueriesToolStripMenuItem.Click += new System.EventHandler(this.logDNSQueriesToolStripMenuItem_Click_1);
-			// 
-			// openDNSLogToolStripMenuItem
-			// 
-			this.openDNSLogToolStripMenuItem.Name = "openDNSLogToolStripMenuItem";
-			this.openDNSLogToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
-			this.openDNSLogToolStripMenuItem.Text = "Open DNS Log...";
-			this.openDNSLogToolStripMenuItem.Click += new System.EventHandler(this.openDNSLogToolStripMenuItem_Click);
-			// 
-			// enableDNSCryptToolStripMenuItem
-			// 
-			this.enableDNSCryptToolStripMenuItem.Name = "enableDNSCryptToolStripMenuItem";
-			this.enableDNSCryptToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
-			this.enableDNSCryptToolStripMenuItem.Text = "Enable DNSCrypt...";
-			this.enableDNSCryptToolStripMenuItem.Click += new System.EventHandler(this.enableDNSCryptToolStripMenuItem_Click);
+			this.Routing_Column_Action.Text = "Action";
 			// 
 			// Main
 			// 
@@ -419,5 +425,6 @@ namespace vyatta_config_updater
 		private ToolStripMenuItem openDNSLogToolStripMenuItem;
 		private ToolStripMenuItem logDNSQueriesToolStripMenuItem;
 		private ToolStripMenuItem enableDNSCryptToolStripMenuItem;
+		private ColumnHeader Routing_Column_Action;
 	}
 }

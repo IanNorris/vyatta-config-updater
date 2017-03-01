@@ -34,35 +34,31 @@ namespace vyatta_config_updater
 						foreach( var ItemObj in EventArgs.NewItems )
 						{
 							StaticRoutingData Item = (StaticRoutingData)ItemObj;
-							
-							if( Item.Type == RoutingType.Organisation )
-							{
-								VyattaConfigRouting.AddStaticRoutesForOrganization( ConfigRoot, Item.Destination, this, Item.Interface, Item.Name );
-							}
-							else if( Item.Type == RoutingType.ASN )
-							{
-								int ASN = 0;
-								int.TryParse( Item.Destination, out ASN );
 
-								VyattaConfigRouting.AddStaticRoutesForASN( ConfigRoot, ASN, this, Item.Interface, Item.Name );
-							}
-							else if( Item.Type == RoutingType.Netmask )
-							{
-								VyattaConfigRouting.AddStaticRoute( ConfigRoot, this, Item.Destination, Item.Interface, Item.Name );
-							}
-							else if( Item.Type == RoutingType.NetmaskArray )
-							{
-								string[] Netmasks = Item.Destination.Split( new char[] { ';'} );
+							string[] Splits = Item.Destination.Split( new char[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries );
 
-								foreach( string Netmask in Netmasks )
+							foreach( string Value in Splits )
+							{
+								if( Item.Type == RoutingType.Organisation )
 								{
-									VyattaConfigRouting.AddStaticRoute( ConfigRoot, this, Netmask, Item.Interface, Item.Name );
+									VyattaConfigRouting.AddStaticRoutesForOrganization( ConfigRoot, Value.Trim(), this, Item.Interface, Item.Name );
 								}
-							}
-							else
-							{
-								throw new Exception( "Unimplemented type" );
-							}
+								else if( Item.Type == RoutingType.ASN )
+								{
+									int ASN = 0;
+									int.TryParse( Value.Trim(), out ASN );
+
+									VyattaConfigRouting.AddStaticRoutesForASN( ConfigRoot, ASN, this, Item.Interface, Item.Name );
+								}
+								else if( Item.Type == RoutingType.Netmask )
+								{
+									VyattaConfigRouting.AddStaticRoute( ConfigRoot, this, Value.Trim(), Item.Interface, Item.Name );
+								}
+								else
+								{
+									throw new Exception( "Unimplemented type" );
+								}
+						}
 						}
 					}
 					else if( EventArgs.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove )
@@ -70,7 +66,6 @@ namespace vyatta_config_updater
 						foreach( var ItemObj in EventArgs.OldItems )
 						{
 							StaticRoutingData Item = (StaticRoutingData)ItemObj;
-
 							VyattaConfigRouting.DeleteGeneratedStaticRoutes( ConfigRoot, Item.Name );
 						}
 					}

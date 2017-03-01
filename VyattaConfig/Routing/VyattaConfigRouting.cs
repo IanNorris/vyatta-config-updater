@@ -130,7 +130,7 @@ namespace vyatta_config_updater.VyattaConfig.Routing
 													IsAuto = true;
 													break;
 												}
-												else if( Value.Contains( "VCU-Auto:" ) )
+												else if( Value.Contains( "VCU-Auto:" ) && Name == null )
 												{
 													IsAuto = true;
 													break;

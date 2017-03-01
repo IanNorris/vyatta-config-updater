@@ -30,9 +30,10 @@ namespace vyatta_config_updater
 			{
 				StaticRoutingData NewRoute = new StaticRoutingData();
 				NewRoute.Destination = "Netflix";
-				NewRoute.Interface = "Internet";
+				NewRoute.Interface = "eth0";
 				NewRoute.Name = "Netflix";
 				NewRoute.Type = RoutingType.Organisation;
+				NewRoute.Action = StaticRouteAction.ToInterface;
 
 				Data.StaticRoutes.Add( NewRoute );
 			}
@@ -44,9 +45,10 @@ namespace vyatta_config_updater
 			{
 				StaticRoutingData NewRoute = new StaticRoutingData();
 				NewRoute.Destination = "BBC";
-				NewRoute.Interface = "Internet";
+				NewRoute.Interface = "eth0";
 				NewRoute.Name = "BBC";
 				NewRoute.Type = RoutingType.Organisation;
+				NewRoute.Action = StaticRouteAction.ToInterface;
 
 				Data.StaticRoutes.Add( NewRoute );
 			}
@@ -58,9 +60,10 @@ namespace vyatta_config_updater
 			{
 				StaticRoutingData NewRoute = new StaticRoutingData();
 				NewRoute.Destination = "Valve";
-				NewRoute.Interface = "Internet";
+				NewRoute.Interface = "eth0";
 				NewRoute.Name = "Valve";
 				NewRoute.Type = RoutingType.Organisation;
+				NewRoute.Action = StaticRouteAction.ToInterface;
 
 				Data.StaticRoutes.Add( NewRoute );
 			}
@@ -72,9 +75,10 @@ namespace vyatta_config_updater
 			{
 				StaticRoutingData NewRoute = new StaticRoutingData();
 				NewRoute.Destination = "Nest";
-				NewRoute.Interface = "Internet";
+				NewRoute.Interface = "eth0";
 				NewRoute.Name = "Nest";
 				NewRoute.Type = RoutingType.Organisation;
+				NewRoute.Action = StaticRouteAction.ToInterface;
 
 				Data.StaticRoutes.Add( NewRoute );
 			}
