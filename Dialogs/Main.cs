@@ -254,5 +254,17 @@ namespace vyatta_config_updater
 				ResultForm.ShowDialog();
 			}
 		}
+
+		private void disableDNSCryptToolStripMenuItem_Click( object sender, EventArgs e )
+		{
+				var Command = new RouterDisableDNSCrypt( Data, this );
+
+				Busy BusyWorker = new Busy( Command );
+
+				if( BusyWorker.ShowDialog() == DialogResult.OK )
+				{
+					MessageBox.Show( "DNSCrypt has been disabled!\nIt has not been fully removed.", "Success!", MessageBoxButtons.OK, MessageBoxIcon.Information );
+				}
+		}
 	}
 }

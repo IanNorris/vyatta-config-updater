@@ -30,6 +30,38 @@ namespace vyatta_config_updater
 			return false;
 		}
 
+		static public void KillDNSCrypt( VyattaShell Shell )
+		{
+			string RunningDNSCrypt = Shell.RunCommand( "sudo ps ax | grep '[d]nscrypt-proxy'" );
+
+			var MatchDNSCryptProcess = new Regex( @"\W+(\d+)\W+\w+\W+\d+:\d+\W+dnscrypt-proxy.*" );
+
+			var MatchDNSCryptProcessResult = MatchDNSCryptProcess.Match( RunningDNSCrypt );
+			if( MatchDNSCryptProcessResult.Success )
+			{
+				//DNSCrypt is currently running
+
+				Shell.RunCommand( string.Format( "sudo kill {0}", MatchDNSCryptProcessResult.Groups[1].Value ) );
+			}
+		}
+
+		public bool FreeUpPreviousImage( VyattaShell Shell, string CommandResult )
+		{
+			if( CommandResult.Contains( "No space left on device") )
+			{
+				if( MessageBox.Show( "You've run out of disk space on your device,\ndo you want to free up some space by\ndeleting the previous system image?", "Out of disk space!", MessageBoxButtons.YesNoCancel ) == DialogResult.Yes )
+				{
+					Shell.RunCommand( "sudo delete system image" );
+					Shell.RunCommand( "sudo rm -rf /root.dev/w.*" );
+					Shell.RunCommand( "sudo apt-get autoclean" );
+
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		public bool DoWork( Util.UpdateStatusDelegate SetStatus, Util.ShouldCancelDelegate ShouldCancel )
 		{
 			SetStatus( "Connecting to SSH...", 0 );
@@ -53,11 +85,21 @@ namespace vyatta_config_updater
 					Shell.RunCommand( "save" );
 					Shell.RunCommand( "exit" );
 				
+					Prev:
 					SetStatus( "Updating package lists...", 15 );
-					Shell.RunCommand( "sudo apt-get update" );
+					var UpdateResult = Shell.RunCommand( "sudo apt-get update" );
+					if( FreeUpPreviousImage( Shell, UpdateResult ) )
+					{
+						goto Prev;
+					}
 
+					Prev2:
 					SetStatus( "Installing wget...", 20 );
-					Shell.RunCommand( "sudo apt-get install wget" );
+					var WgetResult = Shell.RunCommand( "sudo apt-get install wget" );
+					if( FreeUpPreviousImage( Shell, UpdateResult ) )
+					{
+						goto Prev2;
+					}
 
 					SetStatus( "Checking wget...", 25 );
 					string RecheckWget = Shell.RunCommand( "wget" );
@@ -82,7 +124,18 @@ namespace vyatta_config_updater
 				{
 					SetStatus( "Installing Entware...", 32 );
 
-					Shell.RunCommand( "wget -O - https://pkg.entware.net/binaries/mipsel/installer/installer.sh | sudo sh" );
+					string GetInstaller = Shell.RunCommand( "wget -O - https://pkg.entware.net/binaries/mipsel/installer/installer.sh | sudo sh" );
+					if( GetInstaller.Contains("Connection refused") )
+					{
+						if( MessageBox.Show("The connection to the Entware package server was refused over https.\nDo you want to try again over http? This might indicate a problem on their server or an attempt to interfere with your installation.", "Try again over an insecure connection?", MessageBoxButtons.YesNoCancel) == DialogResult.Yes )
+						{
+							Shell.RunCommand( "wget -O - http://pkg.entware.net/binaries/mipsel/installer/installer.sh | sudo sh" );
+						}
+						else
+						{
+							return false;
+						}
+					}
 					
 					SetStatus( "Checking for Entware...", 60 );
 
@@ -98,8 +151,13 @@ namespace vyatta_config_updater
 				}
 
 				if( ShouldCancel() ) { return false; }
+
+				SetStatus( "Checking for newer packages...", 61 );
+				Shell.RunCommand( "sudo /opt/bin/opkg update" );
 				
 				SetStatus( "Checking for DNSCrypt...", 63 );
+
+				bool WasInstalled = false;
 
 				string DoesDNSCryptExist = Shell.RunCommand( "/opt/sbin/dnscrypt-proxy --help" );
 				if( DoesDNSCryptExist.Contains( "No such file or directory") )
@@ -113,10 +171,26 @@ namespace vyatta_config_updater
 					{
 						throw new Exception( "Unknown state - could not determine if DNSCrypt exists." );
 					}
+
+					WasInstalled = true;
 				}
 				else if( !DoesDNSCryptExist.Contains( "dnscrypt-proxy "))
 				{
 					throw new Exception( "Unknown state - could not determine if DNSCrypt exists." );
+				}
+
+				if( ShouldCancel() ) { return false; }
+
+				if( !WasInstalled )
+				{
+					//It's entirely possible that we've changed something and we previously had DNSCrypt running
+					//So we should find it and kill it.
+
+					SetStatus( "Killing DNSCrypt if running...", 68 );
+
+					KillDNSCrypt( Shell );
+				
+					Shell.RunCommand( "sudo /opt/bin/opkg upgrade dnscrypt-proxy", new Regex( "Choose server from list or hit Enter to continue" ), ChooseResolver );
 				}
 
 				if( ShouldCancel() ) { return false; }
@@ -242,23 +316,6 @@ namespace vyatta_config_updater
 					}
 
 					Client.Disconnect();
-				}
-
-				//It's entirely possible that we've changed something and we previously had DNSCrypt running
-				//So we should find it and kill it.
-
-				SetStatus( "Killing DNSCrypt if running...", 91 );
-
-				string RunningDNSCrypt = Shell.RunCommand( "sudo ps ax | grep '[d]nscrypt-proxy'" );
-
-				var MatchDNSCryptProcess = new Regex( @"\W+(\d+)\W+\w+\W+\d+:\d+\W+dnscrypt-proxy.*" );
-
-				var MatchDNSCryptProcessResult = MatchDNSCryptProcess.Match( RunningDNSCrypt );
-				if( MatchDNSCryptProcessResult.Success )
-				{
-					//DNSCrypt is currently running
-
-					Shell.RunCommand( string.Format( "sudo kill {0}", MatchDNSCryptProcessResult.Groups[1].Value ) );
 				}
 
 				Shell.RunCommand( "sudo cp /tmp/NewStartupScript /config/scripts/post-config.d/start_dnscrypt.sh" );

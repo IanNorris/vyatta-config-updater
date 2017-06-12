@@ -83,6 +83,7 @@
     <Compile Include="Dialogs\Busy.Designer.cs">
       <DependentUpon>Busy.cs</DependentUpon>
     </Compile>
+    <Compile Include="Jobs\DNSCrypt\RouterDisableDNSCrypt.cs" />
     <Compile Include="Routing\IPRoute.cs" />
     <Compile Include="Utilities\BusyWorkInterface.cs" />
     <Compile Include="Utilities\ChainWorker.cs" />

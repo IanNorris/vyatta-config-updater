@@ -121,6 +121,10 @@ namespace vyatta_config_updater
 					}
 				}
 			}
+			catch( System.Security.Cryptography.CryptographicException )
+			{
+				return "";
+			}
 			finally
 			{
 				if( AES != null )

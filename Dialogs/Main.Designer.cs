@@ -70,6 +70,7 @@ namespace vyatta_config_updater
 			this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.Routing_Column_Action = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.disableDNSCryptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.MainLayout.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
@@ -320,9 +321,10 @@ namespace vyatta_config_updater
 			this.dNSToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openDNSLogToolStripMenuItem,
             this.logDNSQueriesToolStripMenuItem,
-            this.enableDNSCryptToolStripMenuItem});
+            this.enableDNSCryptToolStripMenuItem,
+            this.disableDNSCryptToolStripMenuItem});
 			this.dNSToolStripMenuItem.Name = "dNSToolStripMenuItem";
-			this.dNSToolStripMenuItem.Size = new System.Drawing.Size(151, 22);
+			this.dNSToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
 			this.dNSToolStripMenuItem.Text = "DNS";
 			// 
 			// openDNSLogToolStripMenuItem
@@ -360,9 +362,12 @@ namespace vyatta_config_updater
 			this.aboutToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
 			this.aboutToolStripMenuItem.Text = "&About...";
 			// 
-			// Routing_Column_Action
+			// disableDNSCryptToolStripMenuItem
 			// 
-			this.Routing_Column_Action.Text = "Action";
+			this.disableDNSCryptToolStripMenuItem.Name = "disableDNSCryptToolStripMenuItem";
+			this.disableDNSCryptToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
+			this.disableDNSCryptToolStripMenuItem.Text = "Disable DNSCrypt";
+			this.disableDNSCryptToolStripMenuItem.Click += new System.EventHandler(this.disableDNSCryptToolStripMenuItem_Click);
 			// 
 			// Main
 			// 
@@ -426,5 +431,6 @@ namespace vyatta_config_updater
 		private ToolStripMenuItem logDNSQueriesToolStripMenuItem;
 		private ToolStripMenuItem enableDNSCryptToolStripMenuItem;
 		private ColumnHeader Routing_Column_Action;
+		private ToolStripMenuItem disableDNSCryptToolStripMenuItem;
 	}
 }
