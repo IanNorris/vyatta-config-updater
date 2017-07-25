@@ -47,7 +47,7 @@ namespace vyatta_config_updater
 
 		public bool FreeUpPreviousImage( VyattaShell Shell, string CommandResult )
 		{
-			if( CommandResult.Contains( "No space left on device") )
+			if( CommandResult.Contains( "No space left on device") || CommandResult.Contains( "Not found") || CommandResult.Contains( "not found") || CommandResult.Contains( "Some index files failed to download" ) )
 			{
 				if( MessageBox.Show( "You've run out of disk space on your device,\ndo you want to free up some space by\ndeleting the previous system image?", "Out of disk space!", MessageBoxButtons.YesNoCancel ) == DialogResult.Yes )
 				{
@@ -84,29 +84,51 @@ namespace vyatta_config_updater
 					Shell.RunCommand( "commit" );
 					Shell.RunCommand( "save" );
 					Shell.RunCommand( "exit" );
-				
-					Prev:
-					SetStatus( "Updating package lists...", 15 );
-					var UpdateResult = Shell.RunCommand( "sudo apt-get update" );
-					if( FreeUpPreviousImage( Shell, UpdateResult ) )
-					{
-						goto Prev;
-					}
 
-					Prev2:
-					SetStatus( "Installing wget...", 20 );
 					var WgetResult = Shell.RunCommand( "sudo apt-get install wget" );
-					if( FreeUpPreviousImage( Shell, UpdateResult ) )
+					if(		WgetResult.Contains( "Package 'wget' has no installation candidate" )
+						||	WgetResult.Contains( "Unable to locate package wget" ) )
 					{
-						goto Prev2;
-					}
+						Prev:
+						SetStatus( "Updating package lists...", 15 );
+						var UpdateResult = Shell.RunCommand( "sudo apt-get update" );
+						if( FreeUpPreviousImage( Shell, UpdateResult ) )
+						{
+							goto Prev;
+						}
+						if( UpdateResult.Contains( "Not Found" ) || UpdateResult.Contains( "not Found" ) )
+						{
+							string[] Lines = UpdateResult.Split( new [] { '\n' }, StringSplitOptions.RemoveEmptyEntries );
+							int Max5Lines = Lines.Length - 5;
+							string LastUpdateBlock = string.Join( "\n", Lines, Max5Lines, Lines.Length - Math.Max( Max5Lines, 0 ) );
 
-					SetStatus( "Checking wget...", 25 );
-					string RecheckWget = Shell.RunCommand( "wget" );
+							throw new Exception( "One or more packages was not found:\n" + LastUpdateBlock );
+						}
 
-					if( !RecheckWget.Contains( "wget: missing URL" ) )
-					{
-						throw new Exception( "wget not found after installation." );
+						Prev2:
+						SetStatus( "Installing wget...", 20 );
+						WgetResult = Shell.RunCommand( "sudo apt-get install wget" );
+						if(		WgetResult.Contains( "Package 'wget' has no installation candidate" )
+							||	WgetResult.Contains( "Unable to locate package wget" ) )
+						{
+							string[] Lines = UpdateResult.Split( new [] { '\n' }, StringSplitOptions.RemoveEmptyEntries );
+							int Max5Lines = Lines.Length - 5;
+							string LastUpdateBlock = string.Join( "\n", Lines, Max5Lines, Lines.Length - Math.Max( Max5Lines, 0 ) );
+
+							throw new Exception( "Unable to install wget:\n" + LastUpdateBlock + WgetResult );
+						}
+						if( FreeUpPreviousImage( Shell, UpdateResult ) )
+						{
+							goto Prev2;
+						}
+
+						SetStatus( "Checking wget...", 25 );
+						string RecheckWget = Shell.RunCommand( "wget" );
+
+						if( !RecheckWget.Contains( "wget: missing URL" ) )
+						{
+							throw new Exception( "wget not found after installation." );
+						}
 					}
 				}
 				else if( !DoesWgetExist.Contains( "wget: missing URL" ) )
